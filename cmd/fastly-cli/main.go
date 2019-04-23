@@ -29,7 +29,7 @@ func initConfig() {
 func main() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVarP(&globalConfig.FastlyAPIKey, "fastlyAPIKey", "a", globalConfig.FastlyAPIKey, "FastlyAPIKey to use")
+	rootCmd.PersistentFlags().StringVarP(&globalConfig.FastlyAPIKey, "fastlyAPIKey", "a", globalConfig.FastlyAPIKey, "Fastly API Key to use")
 
 	registerLaunchCommand(rootCmd)
 	err := registerCreateCommand(rootCmd)

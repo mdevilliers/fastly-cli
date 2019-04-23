@@ -32,7 +32,8 @@ type Token struct {
 type GetTokensInput struct{}
 
 // GetTokens returns all of a users tokens or an error.
-// A fastly.Client is passed in to the function as a shim for inclusion in the fastly-go library
+// A fastly.Client is passed in to the function as a shim for inclusion in the fastly-go library.
+// If merged with fastly-go removing this parameter is trivial.
 func GetTokens(c *fastly.Client, i *GetTokensInput) ([]*Token, error) {
 
 	resp, err := c.Get("/tokens", nil)
@@ -62,7 +63,8 @@ type CreateTokenInput struct {
 func CreateToken(i *CreateTokenInput) (*Token, error) {
 
 	// create a client with an empty API Key as the POST /tokens endpoint
-	// doesn't require an API Key
+	// doesn't require an API Key. If merged with fastly-go this weirdness
+	// can be delt with as an implementation detail
 	client, err := fastly.NewClientForEndpoint("", fastly.DefaultEndpoint)
 
 	if err != nil {

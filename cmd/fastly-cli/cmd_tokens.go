@@ -48,5 +48,4 @@ func registerTokenCommands(root *cobra.Command) {
 	tokenRoot.AddCommand(listTokens)
 
 	root.AddCommand(tokenRoot)
-
 }
