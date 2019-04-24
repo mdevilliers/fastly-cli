@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+        environment:
+    working_directory: /go/src/github.com/mdevilliers/fastly-cli
+    steps:
+      - checkout
+      - run: make lint
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build
