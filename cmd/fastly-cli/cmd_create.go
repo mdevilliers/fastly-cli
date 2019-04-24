@@ -13,6 +13,7 @@ import (
 func registerCreateCommand(root *cobra.Command) error {
 
 	var serviceName string
+	var tokenName string
 	var createAPIKey bool
 	var enable2FA bool
 
@@ -43,8 +44,12 @@ func registerCreateCommand(root *cobra.Command) error {
 				return nil
 			}
 
+			if tokenName == "" {
+				tokenName = serviceName
+			}
+
 			tokenInput := &tokens.CreateTokenInput{
-				Name:     fmt.Sprintf("API-%s", serviceName),
+				Name:     tokenName,
 				Services: []string{service.ID},
 				Scope:    "global",
 			}
@@ -90,7 +95,8 @@ func registerCreateCommand(root *cobra.Command) error {
 		}}
 
 	createCommand.Flags().StringVar(&serviceName, "service-name", serviceName, "Name of service to create")
-	createCommand.Flags().BoolVar(&createAPIKey, "create-api-user", true, "Create an API user")
+	createCommand.Flags().StringVar(&tokenName, "token-name", tokenName, "Name of the API token to create. Defaults to the service-name if not supplied")
+	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", true, "Create an API token")
 	createCommand.Flags().BoolVar(&enable2FA, "enable-2FA", true, "Use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
 	err := createCommand.MarkFlagRequired("service-name")
