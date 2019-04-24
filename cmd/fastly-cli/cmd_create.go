@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 
+	"github.com/mdevilliers/fastly-cli/pkg/terminal"
 	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-fastly/fastly"
@@ -51,33 +49,33 @@ func registerCreateCommand(root *cobra.Command) error {
 				Scope:    "global",
 			}
 
-			reader := bufio.NewReader(os.Stdin)
+			username, err := terminal.GetInput("Enter your Fastly username :")
 
-			fmt.Println("username:")
-			input, err := reader.ReadString('\n')
 			if err != nil {
 				return errors.Wrap(err, "error reading username")
 			}
-			tokenInput.Username = strings.Replace(input, "\n", "", -1)
 
-			fmt.Println("password:")
-			input, err = reader.ReadString('\n')
+			tokenInput.Username = username
+
+			password, err := terminal.GetInputSecret("Enter your Fastly password :")
+
 			if err != nil {
 				return errors.Wrap(err, "error reading password")
 			}
-			tokenInput.Password = strings.Replace(input, "\n", "", -1)
+
+			tokenInput.Password = password
 
 			if enable2FA {
-				fmt.Println("2FA:")
-				input, err = reader.ReadString('\n')
+
+				token, err := terminal.GetInputSecret("Enter your 2FA Token :") // nolint: govet
+
 				if err != nil {
-					return errors.Wrap(err, "error reading 2FA")
+					return errors.Wrap(err, "error reading 2FA Token")
 				}
-				tokenInput.TwoFAToken = strings.Replace(input, "\n", "", -1)
+
+				tokenInput.TwoFAToken = token
 
 			}
-
-			fmt.Println("tokenInput", tokenInput)
 
 			token, err := tokens.CreateToken(tokenInput)
 

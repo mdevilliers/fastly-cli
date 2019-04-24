@@ -21,5 +21,6 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3 // indirect
+	golang.org/x/crypto v0.0.0-20190422183909-d864b10871cd
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
