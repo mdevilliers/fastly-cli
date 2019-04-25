@@ -1,11 +1,26 @@
 ### fastly-cli
 
+A highly opionated cli to aid me in my day to day tasks with Fastly.
+```./fastly-cli 
+Usage:
+  fastly-cli [command]
+
+Available Commands:
+  create      Create a new Fastly service
+  help        Help about any command
+  launch      Fuzzy search for a service and launch in browser.
+  tokens      Manage API tokens
+
+Flags:
+  -a, --fastlyAPIKey string   Fastly API Key to use
+  -h, --help                  help for fastly-cli
+```
+
 Install
 
 ```
 go get github.com/mdevilliers/fastly-cli/cmd/fastly-cli
 ```
-
 
 Fuzzy search on service names and launch web UI
 
