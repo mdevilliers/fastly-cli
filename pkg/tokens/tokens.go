@@ -6,8 +6,10 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"strings"
 	"time"
 
+	"github.com/google/go-querystring/query"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-fastly/fastly"
@@ -50,13 +52,13 @@ func GetTokens(c *fastly.Client, i *GetTokensInput) ([]*Token, error) {
 
 // CreateTokenInput contains all of the data for a CreateToken request
 type CreateTokenInput struct {
-	Name       string    `form:"name"`
-	Username   string    `form:"username"`
-	Password   string    `form:"password"`
-	Scope      string    `form:"scope"`
-	TwoFAToken string    `form:"-"`
-	Services   []string  `form:"services"`
-	ExpiresAt  time.Time `form:"-"` // NOTE : not implemented
+	Name       string    `url:"name"`
+	Username   string    `url:"username"`
+	Password   string    `url:"password"`
+	Scope      string    `url:"scope"`
+	TwoFAToken string    `url:"-"` // NOTE: don't serialise
+	Services   []string  `url:"services"`
+	ExpiresAt  time.Time `url:"-"` // NOTE : not implemented
 }
 
 // CreateToken returns the new Token or an error
@@ -77,7 +79,7 @@ func CreateToken(i *CreateTokenInput) (*Token, error) {
 		ro.Headers = map[string]string{"Fastly-OTP": i.TwoFAToken}
 	}
 
-	resp, err := client.RequestForm("POST", "/tokens", i, ro)
+	resp, err := RequestForm(client, "POST", "/tokens", i, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +90,32 @@ func CreateToken(i *CreateTokenInput) (*Token, error) {
 	}
 	return s, nil
 
+}
+
+// RequestForm makes an HTTP request with the given interface being encoded as
+// form data
+// NOTE : this has been patched from the go-fastly to URL encode the tags correctly (or as Fastly are expecting them....)
+func RequestForm(c *fastly.Client, verb, p string, i interface{}, ro *fastly.RequestOptions) (*http.Response, error) {
+	if ro == nil {
+		ro = new(fastly.RequestOptions)
+	}
+
+	if ro.Headers == nil {
+		ro.Headers = make(map[string]string)
+	}
+	ro.Headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+	v, err := query.Values(i)
+
+	if err != nil {
+		return nil, err
+	}
+
+	body := v.Encode()
+	ro.Body = strings.NewReader(body)
+	ro.BodyLength = int64(len(body))
+
+	return c.Request(verb, p, ro)
 }
 
 // Below are copied from the go-fastly client

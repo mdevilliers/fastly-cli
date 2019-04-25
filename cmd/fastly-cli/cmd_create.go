@@ -36,7 +36,7 @@ func registerCreateCommand(root *cobra.Command) error {
 				return errors.Wrap(err, "error creating Service")
 			}
 
-			// TODO : output to differenct formats
+			// TODO : output to different formats
 			fmt.Println("service created")
 			fmt.Println("service ID : ", service.ID)
 
@@ -88,16 +88,16 @@ func registerCreateCommand(root *cobra.Command) error {
 				return errors.Wrap(err, "error creating token")
 			}
 
-			fmt.Println(token.Name)
-			fmt.Println(token.AccessToken)
+			fmt.Println("API :", token.Name)
+			fmt.Println("API access token", token.AccessToken)
 
 			return nil
 		}}
 
-	createCommand.Flags().StringVar(&serviceName, "service-name", serviceName, "Name of service to create")
-	createCommand.Flags().StringVar(&tokenName, "token-name", tokenName, "Name of the API token to create. Defaults to the service-name if not supplied")
-	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", true, "Create an API token")
-	createCommand.Flags().BoolVar(&enable2FA, "enable-2FA", true, "Use 2FA. If enabled you will be asked to provide a token when creating an API user")
+	createCommand.Flags().StringVar(&serviceName, "service-name", serviceName, "name of service to create")
+	createCommand.Flags().StringVar(&tokenName, "token-name", tokenName, "name of the API token to create. Defaults to the service-name if not supplied")
+	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", true, "create an API token")
+	createCommand.Flags().BoolVar(&enable2FA, "enable-2FA", true, "use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
 	err := createCommand.MarkFlagRequired("service-name")
 

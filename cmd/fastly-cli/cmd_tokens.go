@@ -37,6 +37,7 @@ func registerTokenCommands(root *cobra.Command) {
 			}
 
 			for _, t := range all {
+				// TODO : use different output formats
 				fmt.Println(t.Name, "[", t.ID, "]")
 				fmt.Println("services :", t.Services)
 			}
