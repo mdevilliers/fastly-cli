@@ -1,6 +1,6 @@
 ### fastly-cli
 
-A highly opionated cli to aid me in my day to day tasks with Fastly.
+A highly opinionated CLI to aid me in my day-to-day tasks with Fastly.
 ```./fastly-cli 
 Usage:
   fastly-cli [command]
