@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly"
-	"github.com/mdevilliers/fastly-cli/pkg/terminal"
+	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/spf13/cobra"
@@ -14,6 +13,7 @@ func registerCreateCommand(root *cobra.Command) error {
 
 	var serviceName string
 	var tokenName string
+	var tokenScope string
 	var createAPIKey bool
 	var enable2FA bool
 
@@ -48,41 +48,15 @@ func registerCreateCommand(root *cobra.Command) error {
 				tokenName = serviceName
 			}
 
-			tokenInput := &fastly_ext.CreateTokenInput{
-				Name:     tokenName,
-				Services: []string{service.ID},
-				Scope:    "global",
+			tokenInput := tokens.TokenRequest{
+				Name:              tokenName,
+				Services:          []string{service.ID},
+				Scope:             tokenScope,
+				RequireTwoFAToken: enable2FA,
 			}
 
-			username, err := terminal.GetInput("Enter your Fastly username :")
-
-			if err != nil {
-				return errors.Wrap(err, "error reading username")
-			}
-
-			tokenInput.Username = username
-
-			password, err := terminal.GetInputSecret("Enter your Fastly password :")
-
-			if err != nil {
-				return errors.Wrap(err, "error reading password")
-			}
-
-			tokenInput.Password = password
-
-			if enable2FA {
-
-				token, err := terminal.GetInputSecret("Enter your 2FA Token :") // nolint: govet
-
-				if err != nil {
-					return errors.Wrap(err, "error reading 2FA Token")
-				}
-
-				tokenInput.TwoFAToken = token
-
-			}
-
-			token, err := fastly_ext.CreateToken(tokenInput)
+			tokenManager := tokens.Manager()
+			token, err := tokenManager.AddToken(tokenInput)
 
 			if err != nil {
 				return errors.Wrap(err, "error creating token")
@@ -96,6 +70,8 @@ func registerCreateCommand(root *cobra.Command) error {
 
 	createCommand.Flags().StringVar(&serviceName, "service-name", serviceName, "name of service to create")
 	createCommand.Flags().StringVar(&tokenName, "token-name", tokenName, "name of the API token to create. Defaults to the service-name if not supplied")
+	createCommand.Flags().StringVar(&tokenScope, "token-scope", "global", "scope of the API token to create")
+
 	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", true, "create an API token")
 	createCommand.Flags().BoolVar(&enable2FA, "enable-2FA", true, "use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
