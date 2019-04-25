@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/mdevilliers/fastly-cli/pkg/tokens"
+	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/spf13/cobra"
@@ -30,7 +30,7 @@ func registerTokenCommands(root *cobra.Command) {
 				return errors.Wrap(err, "cannot create fastly client")
 			}
 
-			all, err := tokens.GetTokens(client, &tokens.GetTokensInput{})
+			all, err := fastly_ext.GetTokens(client, &fastly_ext.GetTokensInput{})
 
 			if err != nil {
 				return errors.Wrap(err, "error listing tokens")

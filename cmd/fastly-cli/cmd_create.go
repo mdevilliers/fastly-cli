@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
+	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/terminal"
-	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/spf13/cobra"
@@ -48,7 +48,7 @@ func registerCreateCommand(root *cobra.Command) error {
 				tokenName = serviceName
 			}
 
-			tokenInput := &tokens.CreateTokenInput{
+			tokenInput := &fastly_ext.CreateTokenInput{
 				Name:     tokenName,
 				Services: []string{service.ID},
 				Scope:    "global",
@@ -82,7 +82,7 @@ func registerCreateCommand(root *cobra.Command) error {
 
 			}
 
-			token, err := tokens.CreateToken(tokenInput)
+			token, err := fastly_ext.CreateToken(tokenInput)
 
 			if err != nil {
 				return errors.Wrap(err, "error creating token")
