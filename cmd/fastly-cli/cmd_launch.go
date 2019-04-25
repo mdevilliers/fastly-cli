@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 
@@ -15,68 +14,65 @@ import (
 )
 
 const (
-	apiKeyEnvVar = "FASTLY_API_KEY"
-
 	fastlyServiceURLPattern = "https://manage.fastly.com/configure/services/%s"
 )
 
-var launchCommand = &cobra.Command{
-	Use:   "launch",
-	Short: "Fuzzy search for a service and launch in browser.",
-	RunE: func(cmd *cobra.Command, args []string) error {
+func registerLaunchCommand(root *cobra.Command) {
 
-		key := os.Getenv(apiKeyEnvVar)
+	launchCommand := &cobra.Command{
+		Use:   "launch",
+		Short: "Fuzzy search for a service and launch in browser.",
+		RunE: func(cmd *cobra.Command, args []string) error {
 
-		if key == "" {
-			return errors.New("no api key found in environment.\n 'export FASTLY_API_KEY=xxxxx'")
-		}
+			client, err := fastly.NewClient(globalConfig.FastlyAPIKey)
 
-		client, err := fastly.NewClient(key)
+			if err != nil {
+				return errors.Wrap(err, "cannot create fastly client")
+			}
 
-		if err != nil {
-			return errors.Wrap(err, "cannot create fastly client")
-		}
+			services, err := client.ListServices(&fastly.ListServicesInput{})
 
-		services, err := client.ListServices(&fastly.ListServicesInput{})
+			if err != nil {
+				return errors.Wrap(err, "error searching fastly")
+			}
 
-		if err != nil {
-			return errors.Wrap(err, "error searching fastly")
-		}
+			term := ""
 
-		term := ""
+			if len(args) > 0 {
+				term = strings.Join(args, "")
+			}
 
-		if len(args) > 0 {
-			term = strings.Join(args, "")
-		}
+			ordered := fuzzyMatch(services, term)
 
-		ordered := fuzzyMatch(services, term)
+			// if there is only one url launch it
+			if len(ordered) == 1 {
+				return open.Run(fmt.Sprintf(fastlyServiceURLPattern, ordered[0].ID))
+			}
 
-		// if there is only one url launch it
-		if len(ordered) == 1 {
-			return open.Run(fmt.Sprintf(fastlyServiceURLPattern, ordered[0].ID))
-		}
+			// let the user choose which one to launch
+			app := tview.NewApplication()
+			list := tview.NewList()
+			for _, service := range ordered {
 
-		// let the user choose which one to launch
-		app := tview.NewApplication()
-		list := tview.NewList()
-		for _, service := range ordered {
+				url := fmt.Sprintf(fastlyServiceURLPattern, service.ID)
+				list = list.AddItem(service.Name, fmt.Sprintf("Version: %v, Updated at : %v", service.ActiveVersion, service.UpdatedAt),
+					0, // no binding
+					func() {
+						// nolint
+						open.Run(url)
+						app.Stop()
+					})
+			}
 
-			url := fmt.Sprintf(fastlyServiceURLPattern, service.ID)
-			list = list.AddItem(service.Name, fmt.Sprintf("Version: %v, Updated at : %v", service.ActiveVersion, service.UpdatedAt),
-				0, // no binding
-				func() {
-					// nolint
-					open.Run(url)
-					app.Stop()
-				})
-		}
+			list = list.AddItem("Quit", "", 'q', func() {
+				app.Stop()
+			})
 
-		list = list.AddItem("Quit", "", 'q', func() {
-			app.Stop()
-		})
+			return app.SetRoot(list, true).Run()
+		},
+	}
 
-		return app.SetRoot(list, true).Run()
-	},
+	root.AddCommand(launchCommand)
 }
 
 func fuzzyMatch(services []*fastly.Service, term string) []*fastly.Service {
