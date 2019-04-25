@@ -4,7 +4,8 @@ A highly opinionated CLI to aid me in my day-to-day tasks with Fastly.
 
 [![CircleCI](https://circleci.com/gh/mdevilliers/fastly-cli.svg?style=svg)](https://circleci.com/gh/mdevilliers/fastly-cli)
 
-```./fastly-cli 
+```
+./fastly-cli
 Usage:
   fastly-cli [command]
 
@@ -26,9 +27,27 @@ fastly-cli requires Golang 1.12.1+
 go get github.com/mdevilliers/fastly-cli/cmd/fastly-cli
 ```
 
+### Commands
+
 #### launch
 
 Fuzzy search on service names and launch web UI
+
+```
+./fastly-cli launch -h
+Fuzzy search for a service and launch in browser.
+
+Usage:
+  fastly-cli launch [flags]
+
+Flags:
+  -h, --help   help for launch
+
+Global Flags:
+  -a, --fastlyAPIKey string   Fastly API Key to use
+```
+
+Example
 
 ```
 export FASTLY_API_KEY=xxxxxxxxxx
@@ -45,7 +64,8 @@ In the above example 'fastly-cli' will :
 #### create
 
 Create a new Fastly service and an API key scoped to that service.
-``````
+
+```
 ./fastly-cli create -h
 Create a new Fastly service
 
@@ -61,12 +81,13 @@ Flags:
 
 Global Flags:
   -a, --fastlyAPIKey string   Fastly API Key to use
-``````
+```
 
 #### tokens
 
 View API tokens
-``````
+
+```
 ./fastly-cli tokens -h
 Manage API tokens
 
@@ -82,5 +103,5 @@ Flags:
 
 Global Flags:
   -a, --fastlyAPIKey string   Fastly API Key to use
-``````
+```
 
