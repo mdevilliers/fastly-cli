@@ -6,10 +6,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type tokenCreator interface {
-	AddToken(TokenRequest) (Token, error)
-}
-
 // TokenRequest contains data required to create a Fastly API token
 type TokenRequest struct {
 	Name              string
@@ -65,7 +61,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	if req.RequireTwoFAToken {
 
-		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA :", true)
+		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA :", true) // nolint: govet
 
 		if err != nil {
 			return Token{}, err
