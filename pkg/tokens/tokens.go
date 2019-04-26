@@ -10,6 +10,7 @@ type tokenCreator interface {
 	AddToken(TokenRequest) (Token, error)
 }
 
+// TokenRequest contains data required to create a Fastly API token
 type TokenRequest struct {
 	Name              string
 	Username          string
@@ -19,6 +20,8 @@ type TokenRequest struct {
 	RequireTwoFAToken bool
 	Services          []string
 }
+
+// Token is a created Fastly API token
 type Token struct {
 	Name        string
 	ID          string
@@ -28,10 +31,12 @@ type Token struct {
 
 type tokenManager struct{}
 
-func Manager() *tokenManager {
+// Manager returns an ability to AddTokens
+func Manager() *tokenManager { // nolint
 	return &tokenManager{}
 }
 
+// AddToken creates an API Token for a service(s) or an error
 func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	tokenInput := &fastly_ext.CreateTokenInput{
