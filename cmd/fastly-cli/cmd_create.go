@@ -53,6 +53,8 @@ func registerCreateCommand(root *cobra.Command) error {
 				Services:          []string{service.ID},
 				Scope:             tokenScope,
 				RequireTwoFAToken: enable2FA,
+				Username:          globalConfig.FastlyUserName,
+				Password:          globalConfig.FastlyUserPassword,
 			}
 
 			tokenManager := tokens.Manager()
