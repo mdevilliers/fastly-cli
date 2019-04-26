@@ -50,17 +50,17 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	tokenInput.Username = username
 
-	password, err := suppliedOrInteractive(req.Username, "Enter your Fastly password :", true)
+	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password :", true)
 
 	if err != nil {
 		return Token{}, err
 	}
 
-	tokenInput.Username = password
+	tokenInput.Password = password
 
 	if req.RequireTwoFAToken {
 
-		token, err := suppliedOrInteractive(req.Username, "Enter your Fastly 2FA :", true)
+		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA :", true)
 
 		if err != nil {
 			return Token{}, err

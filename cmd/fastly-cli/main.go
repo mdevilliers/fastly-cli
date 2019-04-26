@@ -20,7 +20,7 @@ type config struct {
 var globalConfig config
 
 func initConfig() {
-	globalConfig = config{}
+
 	err := envconfig.Process("", &globalConfig)
 
 	if err != nil {
