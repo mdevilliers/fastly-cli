@@ -16,7 +16,7 @@ func GetInput(prompt string) (string, error) {
 
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Print("/n" + prompt)
+	fmt.Print("\n" + prompt)
 	input, err := reader.ReadString('\n')
 	if err != nil {
 		return "", errors.Wrap(err, "error reading input")
@@ -29,7 +29,7 @@ func GetInput(prompt string) (string, error) {
 // The user text is not echoed to the terminal.
 func GetInputSecret(prompt string) (string, error) {
 
-	fmt.Print("/n" + prompt)
+	fmt.Print("\n" + prompt)
 	input, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return "", errors.Wrap(err, "error reading input")
