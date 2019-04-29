@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
-	"github.com/rivo/tview"
 	"github.com/sahilm/fuzzy"
 	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/skratchdot/open-golang/open"
@@ -50,25 +50,31 @@ func registerLaunchCommand(root *cobra.Command) {
 			}
 
 			// let the user choose which one to launch
-			app := tview.NewApplication()
-			list := tview.NewList()
-			for _, service := range ordered {
+			all := indexable(ordered)
 
-				url := fmt.Sprintf(fastlyServiceURLPattern, service.ID)
-				list = list.AddItem(service.Name, fmt.Sprintf("Version: %v, Updated at : %v", service.ActiveVersion, service.UpdatedAt),
-					0, // no binding
-					func() {
-						// nolint
-						open.Run(url)
-						app.Stop()
-					})
+			prompt := promptui.Select{
+				Label: "Select service",
+				Items: all.Keys(),
 			}
 
-			list = list.AddItem("Quit", "", 'q', func() {
-				app.Stop()
-			})
+			_, result, err := prompt.Run()
 
-			return app.SetRoot(list, true).Run()
+			if err != nil {
+				return err
+			}
+
+			service := all.ByKey(result)
+
+			if service != nil {
+				url := fmt.Sprintf(fastlyServiceURLPattern, service.ID)
+				err := open.Run(url)
+
+				if err != nil {
+					return err
+				}
+
+			}
+			return nil
 		},
 	}
 
@@ -109,3 +115,26 @@ type servicesSource []*fastly.Service
 
 func (s servicesSource) String(i int) string { return s[i].Name }
 func (s servicesSource) Len() int            { return len(s) }
+
+type indexable []*fastly.Service
+
+func (s indexable) Keys() []string {
+
+	r := []string{}
+
+	for i := range s {
+		r = append(r, s[i].Name)
+	}
+
+	return r
+}
+func (s indexable) ByKey(key string) *fastly.Service {
+
+	for i := range s {
+		if s[i].Name == key {
+			return s[i]
+		}
+	}
+
+	return nil
+}

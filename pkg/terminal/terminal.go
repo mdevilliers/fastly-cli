@@ -1,39 +1,27 @@
 package terminal
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
-	"syscall"
-
-	"github.com/pkg/errors"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/manifoldco/promptui"
 )
 
 // GetInput returns some user entered text or an error
-func GetInput(prompt string) (string, error) {
+func GetInput(label string) (string, error) {
 
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("\n" + prompt)
-	input, err := reader.ReadString('\n')
-	if err != nil {
-		return "", errors.Wrap(err, "error reading input")
+	prompt := promptui.Prompt{
+		Label: label,
 	}
 
-	return strings.Replace(input, "\n", "", -1), nil
+	return prompt.Run()
 }
 
 // GetInputSecret returns some user entered text or an error.
 // The user text is not echoed to the terminal.
-func GetInputSecret(prompt string) (string, error) {
+func GetInputSecret(label string) (string, error) {
 
-	fmt.Print("\n" + prompt)
-	input, err := terminal.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return "", errors.Wrap(err, "error reading input")
+	prompt := promptui.Prompt{
+		Label: label,
+		Mask:  '*',
 	}
 
-	return string(input), nil
+	return prompt.Run()
 }
