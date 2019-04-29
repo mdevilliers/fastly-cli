@@ -43,7 +43,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 		Scope:      req.Scope,
 	}
 
-	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username :", false)
+	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username", false)
 
 	if err != nil {
 		return Token{}, err
@@ -51,7 +51,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	tokenInput.Username = username
 
-	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password :", true)
+	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password", true)
 
 	if err != nil {
 		return Token{}, err
@@ -61,7 +61,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	if req.RequireTwoFAToken {
 
-		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA :", true) // nolint: govet
+		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA", true) // nolint: govet
 
 		if err != nil {
 			return Token{}, err
