@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/kelseyhightower/envconfig"
@@ -39,10 +40,15 @@ func main() {
 	err := registerCreateCommand(rootCmd)
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	registerTokenCommands(rootCmd)
+	err = registerTokenCommands(rootCmd)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(-1)
 	}

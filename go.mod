@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/ajg/form v1.5.1
+	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/gdamore/tcell v1.1.1 // indirect
 	github.com/google/go-querystring v1.0.0
