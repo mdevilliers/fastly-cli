@@ -74,7 +74,7 @@ func registerCreateCommand(root *cobra.Command) error {
 	createCommand.Flags().StringVar(&tokenName, "token-name", tokenName, "name of the API token to create. Defaults to the service-name if not supplied")
 	createCommand.Flags().StringVar(&tokenScope, "token-scope", "global", "scope of the API token to create")
 
-	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", true, "create an API token")
+	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", false, "create an API token")
 	createCommand.Flags().BoolVar(&enable2FA, "enable-2FA", true, "use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
 	err := createCommand.MarkFlagRequired("service-name")
