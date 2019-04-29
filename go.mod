@@ -15,6 +15,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/lucasb-eyer/go-colorful v1.0.2 // indirect
+	github.com/manifoldco/promptui v0.3.2
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/moul/http2curl v1.0.0
 	github.com/pkg/errors v0.8.1
