@@ -28,6 +28,10 @@ func registerTokenCommands(root *cobra.Command) error {
 		Short: "Add API token to existing service",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			if service == "" {
+				return errors.New("supply a service name.")
+			}
+
 			tokenInput := tokens.TokenRequest{
 				Name:              tokenName,
 				Services:          []string{service},
@@ -56,7 +60,13 @@ func registerTokenCommands(root *cobra.Command) error {
 	addToken.Flags().StringVar(&tokenScope, "token-scope", "global", "scope of the API token to create")
 	addToken.Flags().BoolVar(&enable2FA, "enable-2FA", true, "use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
-	err := addToken.MarkFlagRequired("token-name")
+	err := addToken.MarkFlagRequired("service-name")
+
+	if err != nil {
+		return err
+	}
+
+	err = addToken.MarkFlagRequired("token-name")
 
 	if err != nil {
 		return err
