@@ -14,7 +14,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/nicksnyder/go-i18n v1.10.0 // indirect
+	github.com/nicksnyder/go-i18n/v2 v2.0.0 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sahilm/fuzzy v0.1.0
