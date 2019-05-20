@@ -9,7 +9,6 @@ require (
 	github.com/google/go-querystring v1.0.0
 	github.com/google/jsonapi v0.0.0-20181016150055-d0428f63eb51 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/manifoldco/promptui v0.3.2
@@ -20,8 +19,7 @@ require (
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/sethvargo/go-fastly v0.4.2
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
-	github.com/spf13/cobra v0.0.3
-	github.com/spf13/pflag v1.0.3 // indirect
+	github.com/spf13/cobra v0.0.4
 	golang.org/x/sys v0.0.0-20190513065954-a5b02f93d862 // indirect
 	golang.org/x/tools v0.0.0-20190520004936-d88f79806bbd // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
