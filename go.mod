@@ -23,6 +23,6 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3 // indirect
 	golang.org/x/sys v0.0.0-20190520083524-61b9204099cb // indirect
-	golang.org/x/tools v0.0.0-20190520004936-d88f79806bbd // indirect
+	golang.org/x/tools v0.0.0-20190527004523-7be61e1b0e51 // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 )
