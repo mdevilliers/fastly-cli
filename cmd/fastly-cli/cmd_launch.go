@@ -66,7 +66,7 @@ func getServiceWithPredicate(client *fastly.Client, term string) (*fastly.Servic
 		return nil, errors.Wrap(err, "error searching fastly")
 	}
 
-	services, err = fuzzyMatch(services, term), nil
+	services = fuzzyMatch(services, term)
 
 	if len(services) == 1 {
 		return services[0], nil
