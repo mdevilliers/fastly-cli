@@ -37,7 +37,13 @@ func main() {
 	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyUserPassword, "fastly-user-password", globalConfig.FastlyUserPassword, "Fastly user password")
 
 	registerLaunchCommand(rootCmd)
-	err := registerCreateCommand(rootCmd)
+	err := registerEavesdropCommand(rootCmd)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = registerCreateCommand(rootCmd)
 
 	if err != nil {
 		log.Fatal(err)

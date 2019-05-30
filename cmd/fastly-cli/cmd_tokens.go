@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly"
+	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-fastly/fastly"
@@ -29,7 +29,7 @@ func registerTokenCommands(root *cobra.Command) error {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if service == "" {
-				return errors.New("supply a service name.")
+				return errors.New("supply a service name")
 			}
 
 			tokenInput := tokens.TokenRequest{

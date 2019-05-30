@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/manifoldco/promptui"
+	"github.com/mdevilliers/fastly-cli/pkg/terminal"
 	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
 	"github.com/sethvargo/go-fastly/fastly"
@@ -30,40 +30,17 @@ func registerLaunchCommand(root *cobra.Command) {
 				return errors.Wrap(err, "cannot create fastly client")
 			}
 
-			services, err := client.ListServices(&fastly.ListServicesInput{})
-
-			if err != nil {
-				return errors.Wrap(err, "error searching fastly")
-			}
-
 			term := ""
 
 			if len(args) > 0 {
 				term = strings.Join(args, "")
 			}
 
-			ordered := fuzzyMatch(services, term)
-
-			// if there is only one url launch it
-			if len(ordered) == 1 {
-				return open.Run(fmt.Sprintf(fastlyServiceURLPattern, ordered[0].ID))
-			}
-
-			// let the user choose which one to launch
-			all := indexable(ordered)
-
-			prompt := promptui.Select{
-				Label: "Select service",
-				Items: all.Keys(),
-			}
-
-			_, result, err := prompt.Run()
+			service, err := getServiceWithPredicate(client, term)
 
 			if err != nil {
 				return err
 			}
-
-			service := all.ByKey(result)
 
 			if service != nil {
 				url := fmt.Sprintf(fastlyServiceURLPattern, service.ID)
@@ -79,6 +56,25 @@ func registerLaunchCommand(root *cobra.Command) {
 	}
 
 	root.AddCommand(launchCommand)
+}
+
+func getServiceWithPredicate(client *fastly.Client, term string) (*fastly.Service, error) {
+
+	services, err := client.ListServices(&fastly.ListServicesInput{})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error searching fastly")
+	}
+
+	services, err = fuzzyMatch(services, term), nil
+
+	if len(services) == 1 {
+		return services[0], nil
+	}
+
+	// let the user choose which one to launch
+	return terminal.NewServiceSelector()(services)
+
 }
 
 func fuzzyMatch(services []*fastly.Service, term string) []*fastly.Service {
@@ -115,26 +111,3 @@ type servicesSource []*fastly.Service
 
 func (s servicesSource) String(i int) string { return s[i].Name }
 func (s servicesSource) Len() int            { return len(s) }
-
-type indexable []*fastly.Service
-
-func (s indexable) Keys() []string {
-
-	r := []string{}
-
-	for i := range s {
-		r = append(r, s[i].Name)
-	}
-
-	return r
-}
-func (s indexable) ByKey(key string) *fastly.Service {
-
-	for i := range s {
-		if s[i].Name == key {
-			return s[i]
-		}
-	}
-
-	return nil
-}

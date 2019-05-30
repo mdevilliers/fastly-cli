@@ -16,7 +16,9 @@ Available Commands:
   tokens      Manage API tokens
 
 Flags:
-  -a, --fastlyAPIKey string   Fastly API Key to use
+      --fastly-api-key string         Fastly API Key
+      --fastly-user-name string       Fastly user name
+      --fastly-user-password string   Fastly user password
   -h, --help                  help for fastly-cli
 ```
 

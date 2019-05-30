@@ -1,4 +1,4 @@
-package fastly
+package fastlyext
 
 import (
 	"encoding/json"

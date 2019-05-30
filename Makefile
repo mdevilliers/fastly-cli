@@ -31,9 +31,10 @@ clean: ## clean up
 
 .PHONY: clean
 
-.PHONY: lint
 lint: $(GO_BIN)/golangci-lint/golangci-lint ## lint
 	$(GO_BIN)/golangci-lint/golangci-lint run
+
+.PHONY: lint
 
 $(GO_BIN)/golangci-lint/golangci-lint:
 	curl -OL https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCI_LINT_VERSION)/$(GOLANGCI_LINT_ARCHIVE)
@@ -45,6 +46,5 @@ $(GO_BIN)/golangci-lint/golangci-lint:
 # 'help' parses the Makefile and displays the help text
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
 
 .PHONY: help
