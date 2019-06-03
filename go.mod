@@ -21,6 +21,6 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.4
 	golang.org/x/sys v0.0.0-20190603003601-4c4f7f33c9ed // indirect
-	golang.org/x/tools v0.0.0-20190527004523-7be61e1b0e51 // indirect
+	golang.org/x/tools v0.0.0-20190603071325-2de7f9bf822c // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 )
