@@ -32,35 +32,18 @@ func NewSession(client *fastly.Client, request SessionRequest) *session { // nol
 }
 
 func (s *session) Dispose(ctx context.Context) error {
-	fmt.Println("dispose called")
+
 	builder := Wrap(s.client, s.request.Service)
-
-	return builder.Action(func(newVersion int) error {
-
-		err := s.ensurePreviousSessionDoesNotExist(newVersion)
-
-		if err != nil {
-			return errors.Wrap(err, "error removing syslog listener")
-		}
-
-		return nil
-	})
-
+	return builder.Action(s.ensurePreviousSessionDoesNotExist)
 }
 
 func (s *session) StartListening() error {
 
 	builder := Wrap(s.client, s.request.Service)
 
-	err := builder.Action(func(newVersion int) error {
+	createSyslog := func(newVersion int) error {
 
-		err := s.ensurePreviousSessionDoesNotExist(newVersion)
-
-		if err != nil {
-			return errors.Wrap(err, "error removing previous version")
-		}
-
-		_, err = s.client.CreateSyslog(&fastly.CreateSyslogInput{
+		_, err := s.client.CreateSyslog(&fastly.CreateSyslogInput{
 			Service:     s.request.Service.ID,
 			Version:     newVersion,
 			Name:        s.uniqueName,
@@ -73,9 +56,10 @@ func (s *session) StartListening() error {
 		if err != nil {
 			return errors.Wrap(err, "error creating syslog")
 		}
-
 		return nil
-	})
+	}
+
+	err := builder.Action(s.ensurePreviousSessionDoesNotExist, createSyslog)
 
 	if err != nil {
 		return err
