@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/mdevilliers/fastly-cli/pkg/eavesdrop"
@@ -49,10 +50,9 @@ func registerEavesdropCommand(root *cobra.Command) error {
 			}
 
 			session := eavesdrop.NewSession(client, eavesdrop.SessionRequest{
-				Endpoint:       endpoint,
-				Port:           port,
-				ServiceID:      service.ID,
-				ServiceVersion: int(service.ActiveVersion),
+				Endpoint: endpoint,
+				Port:     port,
+				Service:  service,
 			})
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -64,8 +64,8 @@ func registerEavesdropCommand(root *cobra.Command) error {
 				return err
 			}
 
-			stop := make(chan os.Signal, 1)
-			signal.Notify(stop, os.Interrupt)
+			stop := make(chan os.Signal, 2)
+			signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
 			<-stop
 
