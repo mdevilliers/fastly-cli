@@ -18,8 +18,8 @@ import (
 
 func registerEavesdropCommand(root *cobra.Command) error {
 
-	var endpoint string
-	var port int
+	var externalEndpoint, localEndpoint string
+	var externalPort, localPort int
 
 	launchCommand := &cobra.Command{
 		Use:   "eavesdrop",
@@ -49,11 +49,11 @@ func registerEavesdropCommand(root *cobra.Command) error {
 				return nil
 			}
 
-			session := eavesdrop.NewSession(client, eavesdrop.SessionRequest{
-				Endpoint: endpoint,
-				Port:     port,
-				Service:  service,
-			})
+			session := eavesdrop.NewSession(client,
+				service,
+				eavesdrop.WithExternalBinding(externalEndpoint, externalPort),
+				eavesdrop.WithLocalBinding(localEndpoint, localPort),
+			)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
@@ -78,8 +78,11 @@ func registerEavesdropCommand(root *cobra.Command) error {
 		},
 	}
 
-	launchCommand.Flags().StringVar(&endpoint, "endpoint", endpoint, "endpoint to use for messages")
-	launchCommand.Flags().IntVar(&port, "port", 443, "port to use for messages")
+	launchCommand.Flags().StringVar(&externalEndpoint, "endpoint", externalEndpoint, "endpoint to use for messages from Fastly")
+	launchCommand.Flags().IntVar(&externalPort, "port", 443, "port to use for messages from Fastly")
+
+	launchCommand.Flags().StringVar(&localEndpoint, "local-endpoint", "localhost", "endpoint to use for messages from external endpoint")
+	launchCommand.Flags().IntVar(&localPort, "local-port", 8080, "port to use for messages from external endpoint")
 
 	err := launchCommand.MarkFlagRequired("endpoint")
 
