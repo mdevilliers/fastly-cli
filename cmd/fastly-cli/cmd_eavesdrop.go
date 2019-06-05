@@ -55,7 +55,7 @@ func registerEavesdropCommand(root *cobra.Command) error {
 				eavesdrop.WithLocalBinding(localEndpoint, localPort),
 			)
 
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
 			err = session.StartListening()
