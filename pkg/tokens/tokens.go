@@ -1,7 +1,7 @@
 package tokens
 
 import (
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly"
+	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/terminal"
 	"github.com/pkg/errors"
 )
