@@ -13,32 +13,34 @@ type serviceInfo struct {
 type serviceMutator func(client *fastly.Client, current serviceInfo) error
 
 type builder struct {
-	client  *fastly.Client
-	service *fastly.Service
-	version int
+	client         *fastly.Client
+	serviceID      string
+	serviceVersion int
+	latestVersion  int
 }
 
 // NewBuilder returns a builder instance that will `Clone`` the current version of a service,
 // apply a series of changes and then `Activate` if no errors
-func NewBuilder(client *fastly.Client, service *fastly.Service) *builder {
+func NewBuilder(client *fastly.Client, serviceID string, serviceVersion int) *builder {
 	return &builder{
-		client:  client,
-		service: service,
+		client:         client,
+		serviceID:      serviceID,
+		serviceVersion: serviceVersion,
 	}
 }
 
 func (b *builder) clone() error {
 
 	newVersion, err := b.client.CloneVersion(&fastly.CloneVersionInput{
-		Service: b.service.ID,
-		Version: int(b.service.ActiveVersion),
+		Service: b.serviceID,
+		Version: b.serviceVersion,
 	})
 
 	if err != nil {
 		return errors.Wrap(err, "error cloning service")
 	}
 
-	b.version = newVersion.Number
+	b.latestVersion = newVersion.Number
 
 	return nil
 }
@@ -54,7 +56,7 @@ func (b *builder) Action(fn ...serviceMutator) error {
 	}
 
 	for i := range fn {
-		err = fn[i](b.client, serviceInfo{ID: b.service.ID, Version: b.version})
+		err = fn[i](b.client, serviceInfo{ID: b.serviceID, Version: b.latestVersion})
 		if err != nil {
 			return err
 		}
@@ -67,8 +69,8 @@ func (b *builder) Action(fn ...serviceMutator) error {
 func (b *builder) activate() error {
 
 	_, err := b.client.ActivateVersion(&fastly.ActivateVersionInput{
-		Service: b.service.ID,
-		Version: b.version,
+		Service: b.serviceID,
+		Version: b.latestVersion,
 	})
 
 	if err != nil {
