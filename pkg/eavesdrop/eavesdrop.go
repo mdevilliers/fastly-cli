@@ -63,13 +63,22 @@ func NewSession(client *fastly.Client, service *fastly.Service, options ...optio
 }
 
 func (s *session) Dispose(ctx context.Context) error {
-	builder := NewBuilder(s.client, s.Service)
+
+	// get latest service
+	latest, err := s.client.GetServiceDetails(&fastly.GetServiceInput{
+		ID: s.Service.ID,
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "error getting latest service")
+	}
+	builder := NewBuilder(s.client, latest.ID, latest.ActiveVersion.Number)
 	return builder.Action(ensurePreviousSessionDoesNotExist)
 }
 
 func (s *session) StartListening() error {
 
-	builder := NewBuilder(s.client, s.Service)
+	builder := NewBuilder(s.client, s.Service.ID, int(s.Service.ActiveVersion))
 
 	createSyslog := func(client *fastly.Client, current serviceInfo) error {
 
