@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"net"
 	"os/user"
 
@@ -13,13 +14,12 @@ import (
 
 type session struct {
 	sessionOptions
-	client     *fastly.Client
-	uniqueName string
+	client *fastly.Client
 }
 
 type option func(*sessionOptions)
 
-// WithExternalBindng ads the facility to override the external TCP service
+// WithExternalBinding adds the facility to override the external TCP service
 func WithExternalBinding(endpoint string, port int) option { // nolint
 	return func(r *sessionOptions) {
 		r.ExternalEndpoint = endpoint
@@ -27,7 +27,7 @@ func WithExternalBinding(endpoint string, port int) option { // nolint
 	}
 }
 
-// WithLocalBindng ads the facility to override the local binding to the TCP service
+// WithLocalBinding adds the facility to override the local binding to the TCP service
 func WithLocalBinding(endpoint string, port int) option { // nolint
 	return func(r *sessionOptions) {
 		r.LocalEndpoint = endpoint
@@ -35,7 +35,6 @@ func WithLocalBinding(endpoint string, port int) option { // nolint
 	}
 }
 
-// sessionRequest contains the information for creating a session
 type sessionOptions struct {
 	ExternalEndpoint string
 	ExternalPort     int
@@ -60,25 +59,24 @@ func NewSession(client *fastly.Client, service *fastly.Service, options ...optio
 	return &session{
 		sessionOptions: *defaultSessionOptions,
 		client:         client,
-		uniqueName:     uniqueName(),
 	}
 }
 
 func (s *session) Dispose(ctx context.Context) error {
-	builder := Wrap(s.client, s.Service)
-	return builder.Action(s.ensurePreviousSessionDoesNotExist)
+	builder := NewBuilder(s.client, s.Service)
+	return builder.Action(ensurePreviousSessionDoesNotExist)
 }
 
 func (s *session) StartListening() error {
 
-	builder := Wrap(s.client, s.Service)
+	builder := NewBuilder(s.client, s.Service)
 
-	createSyslog := func(newVersion int) error {
+	createSyslog := func(client *fastly.Client, current serviceInfo) error {
 
-		_, err := s.client.CreateSyslog(&fastly.CreateSyslogInput{
-			Service:     s.Service.ID,
-			Version:     newVersion,
-			Name:        s.uniqueName,
+		_, err := client.CreateSyslog(&fastly.CreateSyslogInput{
+			Service:     current.ID,
+			Version:     current.Version,
+			Name:        uniqueName(),
 			Address:     s.ExternalEndpoint,
 			Port:        uint(s.ExternalPort),
 			MessageType: "blank",
@@ -91,13 +89,13 @@ func (s *session) StartListening() error {
 		return nil
 	}
 
-	err := builder.Action(s.ensurePreviousSessionDoesNotExist, createSyslog)
+	err := builder.Action(ensurePreviousSessionDoesNotExist, createSyslog)
 
 	if err != nil {
 		return err
 	}
 
-	// start listening
+	// start TCP server
 	binding := fmt.Sprintf("%s:%d", s.LocalEndpoint, s.LocalPort)
 	listener, err := net.Listen("tcp", binding)
 
@@ -105,32 +103,51 @@ func (s *session) StartListening() error {
 		return errors.Wrap(err, "error creating listener")
 	}
 
-	defer listener.Close() // nolint:errcheck
+	go listen(listener)
 
-	connection, err := listener.Accept()
-
-	if err != nil {
-		return errors.Wrap(err, "error accepting connection")
-	}
-	go handleConnection(connection)
 	return nil
 }
 
+func listen(listener net.Listener) {
+
+	defer listener.Close() // nolint:errcheck
+	for {
+
+		fmt.Println("waiting for messages...")
+		connection, err := listener.Accept()
+
+		if err != nil {
+			break
+		}
+		go handleConnection(connection)
+	}
+}
+
 func handleConnection(connection net.Conn) {
+
 	defer connection.Close() // nolint: errcheck
 	reader := bufio.NewReader(connection)
 
 	for {
-		line, _, _ := reader.ReadLine()
+		line, _, err := reader.ReadLine()
+
+		if err != nil {
+			fmt.Println(err.Error())
+			if err == io.EOF {
+				break
+			}
+		}
+
 		fmt.Println(string(line))
 	}
 }
 
-func (s *session) ensurePreviousSessionDoesNotExist(version int) error {
+func ensurePreviousSessionDoesNotExist(client *fastly.Client, current serviceInfo) error {
 
-	l, err := s.client.ListSyslogs(&fastly.ListSyslogsInput{
-		Service: s.Service.ID,
-		Version: version,
+	syslogName := uniqueName()
+	l, err := client.ListSyslogs(&fastly.ListSyslogsInput{
+		Service: current.ID,
+		Version: current.Version,
 	})
 
 	if err != nil {
@@ -138,17 +155,13 @@ func (s *session) ensurePreviousSessionDoesNotExist(version int) error {
 	}
 
 	for _, sys := range l {
-		if sys.Name == s.uniqueName {
+		if sys.Name == syslogName {
 
-			err := s.client.DeleteSyslog(&fastly.DeleteSyslogInput{
-				Service: s.Service.ID,
-				Version: version,
-				Name:    s.uniqueName,
+			return client.DeleteSyslog(&fastly.DeleteSyslogInput{
+				Service: current.ID,
+				Version: current.Version,
+				Name:    syslogName,
 			})
-
-			if err != nil {
-				return err
-			}
 		}
 	}
 	return nil
@@ -163,5 +176,4 @@ func uniqueName() string {
 	}
 
 	return fmt.Sprintf("fastly-cli-%s", user.Username)
-
 }

@@ -5,7 +5,12 @@ import (
 	"github.com/sethvargo/go-fastly/fastly"
 )
 
-type serviceMutator func(version int) error
+type serviceInfo struct {
+	ID      string
+	Version int
+}
+
+type serviceMutator func(client *fastly.Client, current serviceInfo) error
 
 type builder struct {
 	client  *fastly.Client
@@ -13,7 +18,9 @@ type builder struct {
 	version int
 }
 
-func Wrap(client *fastly.Client, service *fastly.Service) *builder {
+// NewBuilder returns a builder instance that will `Clone`` the current version of a service,
+// apply a series of changes and then `Activate` if no errors
+func NewBuilder(client *fastly.Client, service *fastly.Service) *builder {
 	return &builder{
 		client:  client,
 		service: service,
@@ -36,6 +43,8 @@ func (b *builder) clone() error {
 	return nil
 }
 
+// Action takes a series of functions that mutate the current instance or return
+// the first error
 func (b *builder) Action(fn ...serviceMutator) error {
 
 	err := b.clone()
@@ -45,7 +54,7 @@ func (b *builder) Action(fn ...serviceMutator) error {
 	}
 
 	for i := range fn {
-		err = fn[i](b.version)
+		err = fn[i](b.client, serviceInfo{ID: b.service.ID, Version: b.version})
 		if err != nil {
 			return err
 		}
@@ -66,5 +75,4 @@ func (b *builder) activate() error {
 		return errors.Wrap(err, "error activating version")
 	}
 	return nil
-
 }
