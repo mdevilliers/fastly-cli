@@ -56,7 +56,7 @@ Add a syslog logger to a service and stream the output as a series of JSON lines
 The original service is cloned, a syslog listener added and made active. On shutdown the syslog listener is removed.
 
 ``````
-./fastly-cli --fastly-api-key=zYD9MX8Fh9GmEnl48gnURr1Te77Bbhep --endpoint=my.external.com --port=10089 eavesdrop servicename
+./fastly-cli --fastly-api-key=xxxxxxxxxxxxx --endpoint=my.external.com --port=10089 eavesdrop servicename
 
 { "type": "req","service_id": "foo","request_id": "(null)","start_time": "1559726730","fastly_info": "MISS", "datacenter": "LCY","client_ip": "88.202.148.160", "req_method": "GET", "req_uri": "/h", "req_h_host": "www.bar.com", "req_h_referer": "", "req_h_user_agent": "curl/7.58.0", "req_h_accept_encoding": "", "req_header_bytes": "107", "req_body_bytes": "0", "resp_status": "404", "resp_bytes": "71044", "resp_header_bytes": "681", "resp_body_bytes": "70363" }
 { "type": "req","service_id": "foo","request_id": "(null)","start_time": "1559726745","fastly_info": "MISS", "datacenter": "LCY","client_ip": "88.202.148.160", "req_method": "GET", "req_uri": "/hi", "req_h_host": "www.bar.com", "req_h_referer": "", "req_h_user_agent": "curl/7.58.0", "req_h_accept_encoding": "", "req_header_bytes": "108", "req_body_bytes": "0", "resp_status": "404", "resp_bytes": "71064", "resp_header_bytes": "699", "resp_body_bytes": "70365" }
