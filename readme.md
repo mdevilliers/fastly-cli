@@ -49,7 +49,7 @@ In the above example 'fastly-cli' will :
 - if some results will allow you select from a short list
 - if none will display all of your services
 
-### eavesdrop
+#### eavesdrop
 
 Add a syslog logger to a service and stream the output as a series of JSON lines via a local TCP server.
 
