@@ -2,8 +2,8 @@
 
 A highly opinionated CLI to aid me in my day-to-day tasks with Fastly.
 
-[![CircleCI](https://circleci.com/gh/mdevilliers/fastly-cli.svg?style=svg)](https://circleci.com/gh/mdevilliers/fastly-cli)]
-[![ReportCard](https://goreportcard.com/badge/github.com/mdevilliers/fastly-cli)(https://goreportcard.com/report/github.com/mdevilliers/fastly-cli)]
+[![CircleCI](https://circleci.com/gh/mdevilliers/fastly-cli.svg?style=svg)](https://circleci.com/gh/mdevilliers/fastly-cli)
+[![ReportCard](https://goreportcard.com/badge/github.com/mdevilliers/fastly-cli)(https://goreportcard.com/report/github.com/mdevilliers/fastly-cli)
 
 ```
 ./fastly-cli
