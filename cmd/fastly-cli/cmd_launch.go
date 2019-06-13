@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/terminal"
 	"github.com/pkg/errors"
 	"github.com/sahilm/fuzzy"
-	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )

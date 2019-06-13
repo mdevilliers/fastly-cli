@@ -8,8 +8,8 @@ import (
 	"net"
 	"os/user"
 
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/pkg/errors"
-	"github.com/sethvargo/go-fastly/fastly"
 )
 
 type session struct {

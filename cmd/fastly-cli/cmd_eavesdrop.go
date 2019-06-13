@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/eavesdrop"
 	"github.com/pkg/errors"
-	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/spf13/cobra"
 )
 

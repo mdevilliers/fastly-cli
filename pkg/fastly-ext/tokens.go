@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/google/go-querystring/query"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
-	"github.com/sethvargo/go-fastly/fastly"
 )
 
 // Token maps to a Fastly Token
