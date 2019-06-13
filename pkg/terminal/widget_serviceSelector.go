@@ -7,7 +7,10 @@ import (
 
 type serviceSelector func(services []*fastly.Service) (*fastly.Service, error)
 
-func NewServiceSelector() serviceSelector {
+// NewServiceSelector returns a function that when executed with a
+// slice of fastly.Service draws a widget to allow users to select
+// a single fastly.Service
+func NewServiceSelector() serviceSelector { // nolint
 	return selectorWidget
 }
 
@@ -30,6 +33,8 @@ func selectorWidget(services []*fastly.Service) (*fastly.Service, error) {
 
 }
 
+// indexable wraps a slice of fastly.Services returning the
+// set of keys and a lookup or an individual key
 type indexable []*fastly.Service
 
 func (s indexable) Keys() []string {
@@ -39,7 +44,6 @@ func (s indexable) Keys() []string {
 	for i := range s {
 		r = append(r, s[i].Name)
 	}
-
 	return r
 }
 
@@ -50,6 +54,5 @@ func (s indexable) ByKey(key string) *fastly.Service {
 			return s[i]
 		}
 	}
-
 	return nil
 }
