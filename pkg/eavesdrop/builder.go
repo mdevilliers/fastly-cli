@@ -1,8 +1,8 @@
 package eavesdrop
 
 import (
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/pkg/errors"
-	"github.com/sethvargo/go-fastly/fastly"
 )
 
 type serviceInfo struct {

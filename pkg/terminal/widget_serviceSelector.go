@@ -1,8 +1,8 @@
 package terminal
 
 import (
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/manifoldco/promptui"
-	"github.com/sethvargo/go-fastly/fastly"
 )
 
 type serviceSelector func(services []*fastly.Service) (*fastly.Service, error)

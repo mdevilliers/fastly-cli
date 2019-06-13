@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/fastly/go-fastly/fastly"
 	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
-	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/spf13/cobra"
 )
 
