@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type mockTokenCreator struct {
@@ -37,8 +37,8 @@ func Test_MissingInputsGathered(t *testing.T) {
 		RequireTwoFAToken: true,
 	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, 3, count)
+	require.Nil(t, err)
+	require.Equal(t, 3, count)
 
 	// no username, password
 	count = 0
@@ -46,8 +46,8 @@ func Test_MissingInputsGathered(t *testing.T) {
 		RequireTwoFAToken: false,
 	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, 2, count)
+	require.Nil(t, err)
+	require.Equal(t, 2, count)
 
 	// no username
 	count = 0
@@ -56,8 +56,8 @@ func Test_MissingInputsGathered(t *testing.T) {
 		Username:          "John Smith",
 	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, 1, count)
+	require.Nil(t, err)
+	require.Equal(t, 1, count)
 
 	// all supplied
 	count = 0
@@ -67,6 +67,6 @@ func Test_MissingInputsGathered(t *testing.T) {
 		Password:          "secret",
 	})
 
-	assert.Nil(t, err)
-	assert.Equal(t, 0, count)
+	require.Nil(t, err)
+	require.Equal(t, 0, count)
 }
