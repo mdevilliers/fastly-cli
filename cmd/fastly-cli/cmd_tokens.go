@@ -28,6 +28,12 @@ func registerTokenCommands(root *cobra.Command) error {
 		Short: "Add API token to existing service",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			client, err := fastly.NewClient(globalConfig.FastlyAPIKey)
+
+			if err != nil {
+				return errors.Wrap(err, "cannot create fastly client")
+			}
+
 			if service == "" {
 				return errors.New("supply a service name")
 			}
@@ -41,7 +47,9 @@ func registerTokenCommands(root *cobra.Command) error {
 				Password:          globalConfig.FastlyUserPassword,
 			}
 
-			tokenManager := tokens.Manager()
+			extendedClient := fastly_ext.NewExtendedClient(client)
+
+			tokenManager := tokens.Manager(extendedClient)
 			token, err := tokenManager.AddToken(tokenInput)
 
 			if err != nil {
@@ -83,7 +91,9 @@ func registerTokenCommands(root *cobra.Command) error {
 				return errors.Wrap(err, "cannot create fastly client")
 			}
 
-			all, err := fastly_ext.GetTokens(client, &fastly_ext.GetTokensInput{})
+			extendedClient := fastly_ext.NewExtendedClient(client)
+
+			all, err := extendedClient.GetTokens(&fastly_ext.GetTokensInput{})
 
 			if err != nil {
 				return errors.Wrap(err, "error listing tokens")

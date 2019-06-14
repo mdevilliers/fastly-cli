@@ -21,10 +21,12 @@ all: test
 
 .PHONY: all
 
-test: ## run tests
-	$(GO_TEST) $(PACKAGES)
-
 .PHONY: test
+test:
+ifeq ("$(wildcard $(shell which gocov))","")
+	go get github.com/axw/gocov/gocov
+endif
+	gocov test ${PACKAGES} | gocov report
 
 clean: ## clean up
 	rm -rf tmp/
