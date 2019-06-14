@@ -6,14 +6,27 @@ import (
 	"io"
 	"net/http"
 	"reflect"
-	"strings"
 	"time"
 
 	"github.com/fastly/go-fastly/fastly"
-	"github.com/google/go-querystring/query"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
+
+type fastlyClient interface {
+	Get(p string, ro *fastly.RequestOptions) (*http.Response, error)
+}
+
+// NewExtendedClient wraps an existing fastly client allowing for access
+// to the various Token methods
+func NewExtendedClient(c fastlyClient) *Client {
+	return &Client{c}
+}
+
+// Client wraps an existing fastly client
+type Client struct {
+	fastlyClient
+}
 
 // Token maps to a Fastly Token
 type Token struct {
@@ -36,7 +49,7 @@ type GetTokensInput struct{}
 // GetTokens returns all of a users tokens or an error.
 // A fastly.Client is passed in to the function as a shim for inclusion in the fastly-go library.
 // If merged with fastly-go removing this parameter is trivial.
-func GetTokens(c *fastly.Client, i *GetTokensInput) ([]*Token, error) {
+func (c *Client) GetTokens(i *GetTokensInput) ([]*Token, error) {
 
 	resp, err := c.Get("/tokens", nil)
 	if err != nil {
@@ -62,7 +75,7 @@ type CreateTokenInput struct {
 }
 
 // CreateToken returns the new Token or an error
-func CreateToken(i *CreateTokenInput) (*Token, error) {
+func (c *Client) CreateToken(i *CreateTokenInput) (*Token, error) {
 
 	// create a client with an empty API Key as the POST /tokens endpoint
 	// doesn't require an API Key. If merged with fastly-go this weirdness
@@ -79,7 +92,7 @@ func CreateToken(i *CreateTokenInput) (*Token, error) {
 		ro.Headers = map[string]string{"Fastly-OTP": i.TwoFAToken}
 	}
 
-	resp, err := RequestForm(client, "POST", "/tokens", i, ro)
+	resp, err := client.RequestForm("POST", "/tokens", i, ro)
 	if err != nil {
 		return nil, err
 	}
@@ -90,32 +103,6 @@ func CreateToken(i *CreateTokenInput) (*Token, error) {
 	}
 	return s, nil
 
-}
-
-// RequestForm makes an HTTP request with the given interface being encoded as
-// form data
-// NOTE : this has been patched from the go-fastly to URL encode the tags correctly (or as Fastly are expecting them....)
-func RequestForm(c *fastly.Client, verb, p string, i interface{}, ro *fastly.RequestOptions) (*http.Response, error) {
-	if ro == nil {
-		ro = new(fastly.RequestOptions)
-	}
-
-	if ro.Headers == nil {
-		ro.Headers = make(map[string]string)
-	}
-	ro.Headers["Content-Type"] = "application/x-www-form-urlencoded"
-
-	v, err := query.Values(i)
-
-	if err != nil {
-		return nil, err
-	}
-
-	body := v.Encode()
-	ro.Body = strings.NewReader(body)
-	ro.BodyLength = int64(len(body))
-
-	return c.Request(verb, p, ro)
 }
 
 // Below are copied from the go-fastly client

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fastly/go-fastly/fastly"
+	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -57,7 +58,9 @@ func registerCreateCommand(root *cobra.Command) error {
 				Password:          globalConfig.FastlyUserPassword,
 			}
 
-			tokenManager := tokens.Manager()
+			extendedClient := fastly_ext.NewExtendedClient(client)
+
+			tokenManager := tokens.Manager(extendedClient)
 			token, err := tokenManager.AddToken(tokenInput)
 
 			if err != nil {

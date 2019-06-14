@@ -3,7 +3,6 @@ package tokens
 import (
 	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/terminal"
-	"github.com/pkg/errors"
 )
 
 // TokenRequest contains data required to create a Fastly API token
@@ -25,11 +24,15 @@ type Token struct {
 	AccessToken string
 }
 
-type tokenManager struct{}
+type tokenManager struct {
+	client *fastly_ext.Client
+}
 
 // Manager returns an ability to AddTokens
-func Manager() *tokenManager { // nolint
-	return &tokenManager{}
+func Manager(client *fastly_ext.Client) *tokenManager { // nolint
+	return &tokenManager{
+		client: client,
+	}
 }
 
 // AddToken creates an API Token for a service(s) or an error
@@ -43,7 +46,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 		Scope:      req.Scope,
 	}
 
-	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username", false)
+	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username", terminal.GetInput())
 
 	if err != nil {
 		return Token{}, err
@@ -51,7 +54,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	tokenInput.Username = username
 
-	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password", true)
+	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password", terminal.GetInput())
 
 	if err != nil {
 		return Token{}, err
@@ -61,7 +64,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	if req.RequireTwoFAToken {
 
-		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA", true) // nolint: govet
+		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA", terminal.GetInputSecret()) // nolint: govet
 
 		if err != nil {
 			return Token{}, err
@@ -70,7 +73,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 		tokenInput.TwoFAToken = token
 	}
 
-	resp, err := fastly_ext.CreateToken(tokenInput)
+	resp, err := t.client.CreateToken(tokenInput)
 
 	if err != nil {
 		return Token{}, err
@@ -84,24 +87,11 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 	}, nil
 }
 
-func suppliedOrInteractive(input, prompt string, secret bool) (string, error) {
+func suppliedOrInteractive(initial, prompt string, g terminal.TextGatherer) (string, error) {
 
-	if input != "" {
-		return input, nil
+	if initial != "" {
+		return initial, nil
 	}
 
-	var value string
-	var err error
-
-	if secret {
-		value, err = terminal.GetInputSecret(prompt)
-	} else {
-		value, err = terminal.GetInput(prompt)
-	}
-
-	if err != nil {
-		return "", errors.Wrap(err, "error reading value")
-	}
-
-	return value, nil
+	return g(prompt)
 }
