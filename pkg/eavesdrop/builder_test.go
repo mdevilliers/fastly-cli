@@ -79,7 +79,7 @@ func Test_ActivateFailsWithError(t *testing.T) {
 
 }
 
-func Test_ActionCalledOn_Success(t *testing.T) {
+func Test_ActionCalledOnSuccess(t *testing.T) {
 
 	client := &mockClient{
 		cloneVersioner: func(i *fastly.CloneVersionInput) (*fastly.Version, error) {
@@ -105,7 +105,7 @@ func Test_ActionCalledOn_Success(t *testing.T) {
 
 }
 
-func Test_ActionError_PassedOn(t *testing.T) {
+func Test_ActionErrorPassedOn(t *testing.T) {
 
 	client := &mockClient{
 		cloneVersioner: func(i *fastly.CloneVersionInput) (*fastly.Version, error) {
