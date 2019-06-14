@@ -10,7 +10,6 @@ type TextGatherer func(label string) (string, error)
 // GetInput returns a function to return some user entered text or an error
 func GetInput() TextGatherer {
 	return func(label string) (string, error) {
-
 		prompt := promptui.Prompt{
 			Label: label,
 		}

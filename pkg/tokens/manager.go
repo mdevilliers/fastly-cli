@@ -24,21 +24,53 @@ type Token struct {
 	AccessToken string
 }
 
-type tokenManager struct {
-	client *fastly_ext.Client
+type tokenCreator interface {
+	CreateToken(i *fastly_ext.CreateTokenInput) (*fastly_ext.Token, error)
 }
 
-// Manager returns an ability to AddTokens
-func Manager(client *fastly_ext.Client) *tokenManager { // nolint
-	return &tokenManager{
-		client: client,
+type tokenManager struct {
+	client   tokenCreator
+	in       terminal.TextGatherer
+	inSecret terminal.TextGatherer
+}
+
+type option func(*tokenManager)
+
+// WithInput allows an override when asking for plain textutual input
+func WithInput(in terminal.TextGatherer) option {
+	return func(t *tokenManager) {
+		t.in = in
 	}
+}
+
+// WithSecretInput allows an override when asking for secrets
+func WithSecretInput(in terminal.TextGatherer) option {
+	return func(t *tokenManager) {
+		t.inSecret = in
+	}
+}
+
+// Manager returns an ability to AddTokens from the input supplied
+// If required input is missing the manager will ask for the options via the terminal
+func Manager(client tokenCreator, options ...option) *tokenManager { // nolint
+
+	tm := tokenManager{
+		client:   client,
+		in:       terminal.GetInput(),
+		inSecret: terminal.GetInputSecret(),
+	}
+
+	for _, o := range options {
+		o(&tm)
+	}
+	return &tm
 }
 
 // AddToken creates an API Token for a service(s) or an error
 func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	tokenInput := &fastly_ext.CreateTokenInput{
+		Username:   req.Username,
 		Name:       req.Name,
 		Password:   req.Password,
 		TwoFAToken: req.TwoFAToken,
@@ -46,7 +78,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 		Scope:      req.Scope,
 	}
 
-	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username", terminal.GetInput())
+	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username", t.in)
 
 	if err != nil {
 		return Token{}, err
@@ -54,7 +86,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	tokenInput.Username = username
 
-	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password", terminal.GetInput())
+	password, err := suppliedOrInteractive(req.Password, "Enter your Fastly password", t.inSecret)
 
 	if err != nil {
 		return Token{}, err
@@ -64,7 +96,7 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
 	if req.RequireTwoFAToken {
 
-		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA", terminal.GetInputSecret()) // nolint: govet
+		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA", t.inSecret) // nolint: govet
 
 		if err != nil {
 			return Token{}, err
