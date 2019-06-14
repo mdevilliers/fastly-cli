@@ -73,16 +73,16 @@ func (s *session) Dispose(ctx context.Context) error {
 		return errors.Wrap(err, "error getting latest service")
 	}
 	builder := NewBuilder(s.client, latest.ID, latest.ActiveVersion.Number)
-	return builder.Action(ensurePreviousSessionDoesNotExist)
+	return builder.Action(s.ensurePreviousSessionDoesNotExist)
 }
 
 func (s *session) StartListening() error {
 
 	builder := NewBuilder(s.client, s.Service.ID, int(s.Service.ActiveVersion))
 
-	createSyslog := func(client *fastly.Client, current serviceInfo) error {
+	createSyslog := func(current serviceInfo) error {
 
-		_, err := client.CreateSyslog(&fastly.CreateSyslogInput{
+		_, err := s.client.CreateSyslog(&fastly.CreateSyslogInput{
 			Service:     current.ID,
 			Version:     current.Version,
 			Name:        uniqueName(),
@@ -98,7 +98,7 @@ func (s *session) StartListening() error {
 		return nil
 	}
 
-	err := builder.Action(ensurePreviousSessionDoesNotExist, createSyslog)
+	err := builder.Action(s.ensurePreviousSessionDoesNotExist, createSyslog)
 
 	if err != nil {
 		return err
@@ -151,10 +151,10 @@ func handleConnection(connection net.Conn) {
 	}
 }
 
-func ensurePreviousSessionDoesNotExist(client *fastly.Client, current serviceInfo) error {
+func (s *session) ensurePreviousSessionDoesNotExist(current serviceInfo) error {
 
 	syslogName := uniqueName()
-	l, err := client.ListSyslogs(&fastly.ListSyslogsInput{
+	l, err := s.client.ListSyslogs(&fastly.ListSyslogsInput{
 		Service: current.ID,
 		Version: current.Version,
 	})
@@ -166,7 +166,7 @@ func ensurePreviousSessionDoesNotExist(client *fastly.Client, current serviceInf
 	for _, sys := range l {
 		if sys.Name == syslogName {
 
-			return client.DeleteSyslog(&fastly.DeleteSyslogInput{
+			return s.client.DeleteSyslog(&fastly.DeleteSyslogInput{
 				Service: current.ID,
 				Version: current.Version,
 				Name:    syslogName,
