@@ -89,6 +89,7 @@ github.com/sethvargo/go-fastly v0.4.2 h1:WIDh16IvyffX7kE32+2BOIbi70FTECv7sEEGs7E
 github.com/sethvargo/go-fastly v0.4.2/go.mod h1:b7X1uYwftutCoM0cgJgE7UFQoZsoTMITE4QW/8K2BuQ=
 github.com/sethvargo/go-fastly v0.4.3 h1:WUwzKd+5wNt6TWr1kQLm81Z+YC/UHy/XEiusOXF0PbM=
 github.com/sethvargo/go-fastly v0.4.3/go.mod h1:b7X1uYwftutCoM0cgJgE7UFQoZsoTMITE4QW/8K2BuQ=
+github.com/sethvargo/go-fastly v1.0.0/go.mod h1:b7X1uYwftutCoM0cgJgE7UFQoZsoTMITE4QW/8K2BuQ=
 github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e h1:VAzdS5Nw68fbf5RZ8RDVlUvPXNU6Z3jtPCK/qvm4FoQ=
 github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e/go.mod h1:sUM3LWHvSMaG192sy56D9F7CNvL7jUJVXoqM1QKLnog=
 github.com/spf13/afero v1.1.2/go.mod h1:j4pytiNVoe2o6bmDsKpLACNPDBIoEAkihy7loJ1B0CQ=
