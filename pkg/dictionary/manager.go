@@ -131,16 +131,12 @@ func (m *manager) Diff(remote []*fastly.DictionaryItem, local [][]string) (diff.
 		return nil, err
 	}
 
-	remoteMap, err := fastlyDictionaryItemsToMap(remote)
-
-	if err != nil {
-		return nil, err
-	}
+	remoteMap := fastlyDictionaryItemsToMap(remote)
 
 	return diff.Diff(remoteMap, localMap)
 }
 
-func fastlyDictionaryItemsToMap(a []*fastly.DictionaryItem) (map[string]string, error) {
+func fastlyDictionaryItemsToMap(a []*fastly.DictionaryItem) map[string]string {
 
 	m := map[string]string{}
 
@@ -150,7 +146,7 @@ func fastlyDictionaryItemsToMap(a []*fastly.DictionaryItem) (map[string]string, 
 		m[k] = v
 	}
 
-	return m, nil
+	return m
 }
 
 func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
