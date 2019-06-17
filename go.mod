@@ -18,7 +18,6 @@ require (
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sahilm/fuzzy v0.1.0
-	github.com/sethvargo/go-fastly v0.4.3
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.3.0
