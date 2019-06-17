@@ -26,6 +26,7 @@ github.com/dnaeon/go-vcr v1.0.1 h1:r8L/HqC0Hje5AXMu1ooW8oyQyOFv4GxqpL0nRP7SLLY=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
 github.com/fastly/go-fastly v0.4.3 h1:EAedEO5kxlx4P43ACD4hodudCxODcQn2ZS65Q9LHYpc=
 github.com/fastly/go-fastly v0.4.3/go.mod h1:ACxsUdqChasXcraa3/IigjE01rVn3A1F4vaI18Gmm0g=
+github.com/fastly/go-fastly v1.0.0/go.mod h1:ACxsUdqChasXcraa3/IigjE01rVn3A1F4vaI18Gmm0g=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/golang/lint v0.0.0-20181026193005-c67002cb31c3 h1:I4BOK3PBMjhWfQM2zPJKK7lOBGsrsvOB7kBELP33hiE=
 github.com/golang/lint v0.0.0-20181026193005-c67002cb31c3/go.mod h1:tluoj9z5200jBnyusfRPU2LqT6J+DAorxEvtC7LHB+E=
