@@ -14,14 +14,14 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/nicksnyder/go-i18n/v2 v2.0.1 // indirect
+	github.com/nicksnyder/go-i18n/v2 v2.0.2 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/sethvargo/go-fastly v0.4.3
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
-	github.com/stretchr/testify v1.2.2
+	github.com/stretchr/testify v1.3.0
 	golang.org/x/sys v0.0.0-20190610084145-1e42afee0f76 // indirect
 	golang.org/x/tools v0.0.0-20190610005435-eacb66d2a7c3 // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
