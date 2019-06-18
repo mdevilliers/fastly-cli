@@ -1,7 +1,6 @@
 package dictionary
 
 import (
-	"encoding/csv"
 	"fmt"
 
 	"github.com/fastly/go-fastly/fastly"
@@ -10,10 +9,10 @@ import (
 )
 
 type manager struct {
-	serviceID   string
-	dictionary  string
-	localReader *csv.Reader
-	remote      remoteDictionaryMutator
+	serviceID  string
+	dictionary string
+	local      localReader
+	remote     remoteDictionaryMutator
 }
 
 type option func(*manager)
@@ -25,9 +24,13 @@ func WithRemoteDictionary(serviceID, dictionary string) option {
 	}
 }
 
-func WithLocalCSVReader(reader *csv.Reader) option {
+type localReader interface {
+	ReadAll() (records [][]string, err error)
+}
+
+func WithLocalCSVReader(reader localReader) option {
 	return func(m *manager) {
-		m.localReader = reader
+		m.local = reader
 	}
 }
 
@@ -62,7 +65,7 @@ func (m *manager) Sync() error {
 		return errors.Wrap(err, "error retrieving dictionary items")
 	}
 
-	localItems, err := m.localReader.ReadAll()
+	localItems, err := m.local.ReadAll()
 
 	if err != nil {
 		return errors.Wrap(err, "error reading local dictionary items")
