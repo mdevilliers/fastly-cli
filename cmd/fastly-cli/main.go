@@ -55,6 +55,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = registerSyncCommand(rootCmd)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(-1)
 	}

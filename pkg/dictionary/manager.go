@@ -17,6 +17,7 @@ type manager struct {
 
 type option func(*manager)
 
+// WithRemoteDictionary allows specifying the Fastly service and dictionary to use
 func WithRemoteDictionary(serviceID, dictionary string) option {
 	return func(m *manager) {
 		m.serviceID = serviceID
@@ -28,6 +29,7 @@ type localReader interface {
 	ReadAll() (records [][]string, err error)
 }
 
+// WithLocalReader allows specifying the local dictionary provider
 func WithLocalReader(reader localReader) option {
 	return func(m *manager) {
 		m.local = reader
@@ -41,6 +43,7 @@ type remoteDictionaryMutator interface {
 	DeleteDictionaryItem(i *fastly.DeleteDictionaryItemInput) error
 }
 
+// Manager returns a way of syncing a local dictionary with a remote one
 func Manager(client remoteDictionaryMutator, options ...option) *manager { // nolint
 	m := &manager{
 		remote: client,
@@ -53,6 +56,10 @@ func Manager(client remoteDictionaryMutator, options ...option) *manager { // no
 	return m
 }
 
+// Sync syncs a local dictionary with a remote one or returns an error
+// Local items not remotely available are added
+// Remote items not locally available are deleted
+// Changed local items are updated
 func (m *manager) Sync() error {
 
 	// get all or the remote items
@@ -71,7 +78,7 @@ func (m *manager) Sync() error {
 		return errors.Wrap(err, "error reading local dictionary items")
 	}
 
-	changelog, err := m.Diff(remoteItems, localItems)
+	changelog, err := m.diff(remoteItems, localItems)
 
 	if err != nil {
 		return errors.Wrap(err, "error diffing remote and local dictionary items")
@@ -126,7 +133,7 @@ func (m *manager) Sync() error {
 	return nil
 }
 
-func (m *manager) Diff(remote []*fastly.DictionaryItem, local [][]string) (diff.Changelog, error) {
+func (m *manager) diff(remote []*fastly.DictionaryItem, local [][]string) (diff.Changelog, error) {
 
 	localMap, err := stringSliceSliceToMap(local)
 
@@ -171,6 +178,7 @@ func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 
 }
 
+// DuplicateKeyErr captures the offending key that exists more then once locally
 type DuplicateKeyErr struct {
 	Key string
 }
