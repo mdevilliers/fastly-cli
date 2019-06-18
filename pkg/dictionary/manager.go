@@ -28,7 +28,7 @@ type localReader interface {
 	ReadAll() (records [][]string, err error)
 }
 
-func WithLocalCSVReader(reader localReader) option {
+func WithLocalReader(reader localReader) option {
 	return func(m *manager) {
 		m.local = reader
 	}
