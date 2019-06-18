@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/fastly/go-fastly/fastly"
-	"github.com/stretchr/testify/assert"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,85 +30,121 @@ func (m *mockClient) DeleteDictionaryItem(i *fastly.DeleteDictionaryItemInput) e
 	return m.itemDeleter(i)
 }
 
-func Test_AdditionalRecordsCreated(t *testing.T) {
-
-	createCount := 0
-
-	client := &mockClient{
-		itemLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
-			return []*fastly.DictionaryItem{
-				&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
-			}, nil
+func Test_DiffAndMutate(t *testing.T) {
+	testCases := []struct {
+		name         string
+		remoteLister func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error)
+		localCSV     string
+		created      int
+		deleted      int
+		updated      int
+		err          error
+	}{
+		{
+			name: "creations",
+			remoteLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
+				return []*fastly.DictionaryItem{
+					&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
+				}, nil
+			},
+			localCSV: `one-key,one-value
+two-key,two-value`,
+			created: 1,
 		},
-		itemCreator: func(i *fastly.CreateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-			createCount++
-			//fmt.Println(i.ItemKey, i.ItemValue)
-			return &fastly.DictionaryItem{}, nil
+		{
+			name: "deletions",
+			remoteLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
+				return []*fastly.DictionaryItem{
+					&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
+				}, nil
+			},
+			localCSV: ``,
+			deleted:  1,
+		},
+		{
+			name: "updates",
+			remoteLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
+				return []*fastly.DictionaryItem{
+					&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
+				}, nil
+			},
+			localCSV: `one-key,foo`,
+			updated:  1,
+		},
+		{
+			name: "no changes",
+			remoteLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
+				return []*fastly.DictionaryItem{
+					&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
+				}, nil
+			},
+			localCSV: `one-key,one-value`,
+		},
+		{
+			name: "all",
+			remoteLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
+				return []*fastly.DictionaryItem{
+					&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
+					&fastly.DictionaryItem{ItemKey: "three-key", ItemValue: "three-value"},
+				}, nil
+			},
+			localCSV: `one-key,foo
+two-key,two-value`,
+			created: 1,
+			updated: 1,
+			deleted: 1,
+		},
+		{
+			name: "duplicate-locals-fail",
+			remoteLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
+				return []*fastly.DictionaryItem{
+					&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
+				}, nil
+			},
+			localCSV: `boo-key,one-value
+boo-key,two-value`,
+			err: &duplicateKeyErr{Key: "boo-key"},
 		},
 	}
-	local := `one-key,one-value
-two-key,two-value`
-	reader := csv.NewReader(strings.NewReader(local))
 
-	m := Manager(client, WithLocalCSVReader(reader))
+	for _, tc := range testCases {
 
-	err := m.Sync()
-	require.Nil(t, err)
-	assert.Equal(t, 1, createCount)
-}
+		t.Run(tc.name, func(t *testing.T) {
+			createCount := 0
+			deleteCount := 0
+			updateCount := 0
 
-func Test_RemovedRecordsDeleted(t *testing.T) {
+			client := &mockClient{
+				itemCreator: func(i *fastly.CreateDictionaryItemInput) (*fastly.DictionaryItem, error) {
+					createCount++
+					return &fastly.DictionaryItem{}, nil
+				},
+				itemDeleter: func(i *fastly.DeleteDictionaryItemInput) error {
+					deleteCount++
+					return nil
+				},
+				itemUpdater: func(i *fastly.UpdateDictionaryItemInput) (*fastly.DictionaryItem, error) {
+					updateCount++
+					return &fastly.DictionaryItem{}, nil
+				},
+				itemLister: tc.remoteLister,
+			}
 
-	deleteCount := 0
+			reader := csv.NewReader(strings.NewReader(tc.localCSV))
+			m := Manager(client, WithLocalCSVReader(reader))
 
-	client := &mockClient{
-		itemLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
-			return []*fastly.DictionaryItem{
-				&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
-				&fastly.DictionaryItem{ItemKey: "two-key", ItemValue: "two-value"},
-			}, nil
-		},
-		itemDeleter: func(i *fastly.DeleteDictionaryItemInput) error {
-			deleteCount++
-			//fmt.Println(i.ItemKey, i.ItemValue)
-			return nil
-		},
+			err := m.Sync()
+
+			if tc.err == nil {
+				require.Nil(t, err)
+			} else {
+				require.NotNil(t, err)
+				require.Equal(t, tc.err, errors.Cause(err))
+			}
+
+			require.Equal(t, tc.created, createCount, "failed to create record(s)")
+			require.Equal(t, tc.updated, updateCount, "failed to update record(s)")
+			require.Equal(t, tc.deleted, deleteCount, "failed to delete record(s)")
+		})
 	}
-	local := `one-key,one-value`
-	reader := csv.NewReader(strings.NewReader(local))
-
-	m := Manager(client, WithLocalCSVReader(reader))
-
-	err := m.Sync()
-	require.Nil(t, err)
-	assert.Equal(t, 1, deleteCount)
-}
-
-func Test_ChangedRecordsUpdated(t *testing.T) {
-
-	updateCount := 0
-
-	client := &mockClient{
-		itemLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
-			return []*fastly.DictionaryItem{
-				&fastly.DictionaryItem{ItemKey: "one-key", ItemValue: "one-value"},
-				&fastly.DictionaryItem{ItemKey: "two-key", ItemValue: "two-value"},
-			}, nil
-		},
-		itemUpdater: func(i *fastly.UpdateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-			updateCount++
-			//fmt.Println(i.ItemKey, i.ItemValue)
-			return &fastly.DictionaryItem{}, nil
-		},
-	}
-	local := `one-key,foo-value
-two-key,bar-value`
-
-	reader := csv.NewReader(strings.NewReader(local))
-
-	m := Manager(client, WithLocalCSVReader(reader))
-
-	err := m.Sync()
-	require.Nil(t, err)
-	assert.Equal(t, 2, updateCount)
 }

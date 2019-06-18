@@ -158,7 +158,6 @@ func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 		v := a[i][1]
 
 		_, contains := m[k]
-
 		if contains {
 			return nil, &duplicateKeyErr{Key: k}
 		}
