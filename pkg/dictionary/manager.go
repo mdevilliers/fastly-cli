@@ -162,7 +162,7 @@ func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 
 		_, contains := m[k]
 		if contains {
-			return nil, &duplicateKeyErr{Key: k}
+			return nil, &DuplicateKeyErr{Key: k}
 		}
 
 		m[k] = v
@@ -171,10 +171,10 @@ func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 
 }
 
-type duplicateKeyErr struct {
+type DuplicateKeyErr struct {
 	Key string
 }
 
-func (d *duplicateKeyErr) Error() string {
+func (d *DuplicateKeyErr) Error() string {
 	return fmt.Sprintf("duplicate key : %s", d.Key)
 }
