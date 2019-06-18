@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"encoding/csv"
+	"os"
+
 	"github.com/fastly/go-fastly/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/dictionary"
 	"github.com/pkg/errors"
@@ -9,11 +13,11 @@ import (
 
 func registerSyncCommand(root *cobra.Command) error {
 
-	//	var localFile, dict, service string
+	var localFile, filetype, dict, service string
 
 	syncCommand := &cobra.Command{
 		Use:   "sync",
-		Short: "Sync local dictionaries with Fastly.",
+		Short: "Sync local dictionaries with Fastly edge dictionaries.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			client, err := fastly.NewClient(globalConfig.FastlyAPIKey)
@@ -22,24 +26,32 @@ func registerSyncCommand(root *cobra.Command) error {
 				return errors.Wrap(err, "cannot create fastly client")
 			}
 
-			syncer := dictionary.Manager(client)
+			// we only know about csv files
+			csvFile, err := os.Open(localFile) // nolint : gosec 'localFile' path is passed in via the user
+
+			if err != nil {
+				return errors.Wrap(err, "error opening csv file")
+			}
+
+			reader := csv.NewReader(bufio.NewReader(csvFile))
+
+			syncer := dictionary.Manager(client, dictionary.WithLocalReader(reader), dictionary.WithRemoteDictionary(service, dict))
 
 			return syncer.Sync()
 		},
 	}
 
-	/*launchCommand.Flags().StringVar(&externalEndpoint, "endpoint", externalEndpoint, "endpoint to use for messages from Fastly")
-	launchCommand.Flags().IntVar(&externalPort, "port", 443, "port to use for messages from Fastly")
+	syncCommand.Flags().StringVar(&localFile, "path", localFile, "path to file")
+	syncCommand.Flags().StringVar(&filetype, "file-type", "CSV", "type of file")
+	syncCommand.Flags().StringVar(&dict, "dict", dict, "dictionary to update")
+	syncCommand.Flags().StringVar(&service, "service", service, "service to update")
 
-	launchCommand.Flags().StringVar(&localEndpoint, "local-endpoint", "localhost", "endpoint to use for messages from external endpoint")
-	launchCommand.Flags().IntVar(&localPort, "local-port", 8080, "port to use for messages from external endpoint")
-
-	err := launchCommand.MarkFlagRequired("endpoint")
+	err := markFlagsRequired(syncCommand, "path", "dict", "service")
 
 	if err != nil {
 		return err
 	}
-	*/
+
 	root.AddCommand(syncCommand)
 	return nil
 }

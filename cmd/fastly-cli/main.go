@@ -32,30 +32,16 @@ func initConfig() {
 func main() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyAPIKey, "fastly-api-key", globalConfig.FastlyAPIKey, "Fastly API Key")
-	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyUserName, "fastly-user-name", globalConfig.FastlyUserName, "Fastly user name")
-	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyUserPassword, "fastly-user-password", globalConfig.FastlyUserPassword, "Fastly user password")
+	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyAPIKey, "fastly-api-key", globalConfig.FastlyAPIKey, "Fastly API Key (export FASTLY_API_KEY=xxxx)")
+	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyUserName, "fastly-user-name", globalConfig.FastlyUserName, "Fastly user name (export FASTLY_USER_NAME=xxxx)")
+	rootCmd.PersistentFlags().StringVar(&globalConfig.FastlyUserPassword, "fastly-user-password", globalConfig.FastlyUserPassword, "Fastly user password (export FASTLY_USER_PASSWORD=xxxx)")
 
-	registerLaunchCommand(rootCmd)
-	err := registerEavesdropCommand(rootCmd)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = registerCreateCommand(rootCmd)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = registerTokenCommands(rootCmd)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = registerSyncCommand(rootCmd)
+	err := registerChildCommands(rootCmd,
+		registerEavesdropCommand,
+		registerSyncCommand,
+		registerCreateCommand,
+		registerTokenCommands,
+		registerLaunchCommand)
 
 	if err != nil {
 		log.Fatal(err)
@@ -64,4 +50,31 @@ func main() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(-1)
 	}
+}
+
+type attachChildCommand func(*cobra.Command) error
+
+func registerChildCommands(root *cobra.Command, childern ...attachChildCommand) error {
+
+	for _, cmd := range childern {
+		err := cmd(root)
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func markFlagsRequired(cmd *cobra.Command, flags ...string) error {
+
+	for _, f := range flags {
+		err := cmd.MarkFlagRequired(f)
+
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
 }
