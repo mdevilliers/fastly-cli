@@ -135,8 +135,8 @@ func Test_DiffAndMutate(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-
+	for i := range testCases {
+		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			createCount := 0
 			deleteCount := 0
