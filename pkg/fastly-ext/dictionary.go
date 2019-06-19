@@ -68,7 +68,7 @@ func (c *Client) BatchUpdateDictionaryItems(i *BatchUpdateDictionaryItemsInput) 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint
 
 	// This endpoint returns an object with a status of 'ok' according to the documentation
 	// Other responses are undocumented.
