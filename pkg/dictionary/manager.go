@@ -8,6 +8,20 @@ import (
 	"github.com/r3labs/diff"
 )
 
+const (
+	// https://docs.fastly.com/guides/edge-dictionaries/about-edge-dictionaries
+	// Dictionary containers are limited to 1000 items.
+	maxItems = 1000
+	// Dictionary item keys are limited to 256 characters and their values are limited to 8000 characters
+	maxKeyLength   = 256
+	maxValueLength = 8000
+)
+
+var (
+	// ErrTooManyItems signals the Fastly maximum items has been reached
+	ErrTooManyItems = errors.New("too many items")
+)
+
 type manager struct {
 	serviceID  string
 	dictionary string
@@ -161,6 +175,10 @@ func fastlyDictionaryItemsToMap(a []*fastly.DictionaryItem) map[string]string {
 
 func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 
+	if len(a) > maxItems {
+		return nil, ErrTooManyItems
+	}
+
 	m := map[string]string{}
 
 	for i := range a {
@@ -169,7 +187,13 @@ func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 
 		_, contains := m[k]
 		if contains {
-			return nil, &DuplicateKeyErr{Key: k}
+			return nil, &ErrDuplicateKey{Key: k}
+		}
+
+		err := validateItem(k, v)
+
+		if err != nil {
+			return nil, err
 		}
 
 		m[k] = v
@@ -178,11 +202,42 @@ func stringSliceSliceToMap(a [][]string) (map[string]string, error) {
 
 }
 
-// DuplicateKeyErr captures the offending key that exists more then once locally
-type DuplicateKeyErr struct {
+func validateItem(key, value string) error {
+
+	if len(key) > maxKeyLength {
+		return &ErrKeyTooLong{Key: key}
+	}
+	if len(value) > maxValueLength {
+		return &ErrValueTooLong{Key: key, Value: value}
+	}
+
+	return nil
+}
+
+// ErrDuplicateKey captures the offending key that exists more then once locally
+type ErrDuplicateKey struct {
 	Key string
 }
 
-func (d *DuplicateKeyErr) Error() string {
+func (d *ErrDuplicateKey) Error() string {
 	return fmt.Sprintf("duplicate key : %s", d.Key)
+}
+
+// ErrKeyTooLong signals the Key is too long to be stored
+type ErrKeyTooLong struct {
+	Key string
+}
+
+func (k *ErrKeyTooLong) Error() string {
+	return fmt.Sprintf("key too long (max : %v) : %s", maxKeyLength, k.Key)
+}
+
+// ErrValueTooLong signals the Value is too long to be stored
+type ErrValueTooLong struct {
+	Key   string
+	Value string
+}
+
+func (v *ErrValueTooLong) Error() string {
+	return fmt.Sprintf("value too long (max : %v) : %s : %s", maxValueLength, v.Key, v.Value)
 }

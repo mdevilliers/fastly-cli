@@ -131,7 +131,7 @@ func Test_DiffAndMutate(t *testing.T) {
 					[]string{"boo-key", "bar"},
 				}, nil
 			},
-			err: &DuplicateKeyErr{Key: "boo-key"},
+			err: &ErrDuplicateKey{Key: "boo-key"},
 		},
 	}
 
