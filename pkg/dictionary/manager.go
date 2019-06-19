@@ -34,7 +34,7 @@ type manager struct {
 type option func(*manager)
 
 // WithRemoteDictionary allows specifying the Fastly service and dictionary to use
-// NOTE : this that dictionary is the ID of the dictionary NOT the name
+// NOTE : this that function requires ID's and NOT the name's of the entities
 func WithRemoteDictionary(serviceID, dictionaryID string) option {
 	return func(m *manager) {
 		m.serviceID = serviceID
