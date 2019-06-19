@@ -14,7 +14,11 @@ import (
 )
 
 type fastlyClient interface {
+	// needed for the tokens create shim
 	Get(p string, ro *fastly.RequestOptions) (*http.Response, error)
+	// needed for the batch dictionary update shim
+	PatchJSON(p string, i interface{}, ro *fastly.RequestOptions) (*http.Response, error)
+	ListDictionaryItems(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error)
 }
 
 // NewExtendedClient wraps an existing fastly client allowing for access

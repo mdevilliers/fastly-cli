@@ -7,6 +7,7 @@ A highly opinionated CLI to aid me in my day-to-day tasks with Fastly.
 
 ```
 ./fastly-cli
+
 Usage:
   fastly-cli [command]
 
@@ -15,13 +16,16 @@ Available Commands:
   eavesdrop   Listen in to your Fastly instance.
   help        Help about any command
   launch      Fuzzy search for a service and launch in browser.
+  sync        Sync local CSV files with Fastly edge dictionaries.
   tokens      Manage API tokens
 
 Flags:
-      --fastly-api-key string         Fastly API Key
-      --fastly-user-name string       Fastly user name
-      --fastly-user-password string   Fastly user password
-  -h, --help                  help for fastly-cli
+      --fastly-api-key string         Fastly API Key (export FASTLY_API_KEY=xxxx)
+      --fastly-user-name string       Fastly user name (export FASTLY_USER_NAME=xxxx)
+      --fastly-user-password string   Fastly user password (export FASTLY_USER_PASSWORD=xxxx)
+  -h, --help                          help for fastly-cli
+
+Use "fastly-cli [command] --help" for more information about a command.
 ```
 
 #### Install
@@ -66,7 +70,19 @@ The original service is cloned, a syslog listener added and made active. On shut
 { "type": "req","service_id": "foo","request_id": "(null)","start_time": "1559726750","fastly_info": "MISS", "datacenter": "LCY","client_ip": "88.202.148.160", "req_method": "GET", "req_uri": "/hijk", "req_h_host": "www.bar.com", "req_h_referer": "", "req_h_user_agent": "curl/7.58.0", "req_h_accept_encoding": "", "req_header_bytes": "110", "req_body_bytes": "0", "resp_status": "404", "resp_bytes": "71076", "resp_header_bytes": "707", "resp_body_bytes": "70369" }
 { "type": "req","service_id": "foo","request_id": "(null)","start_time": "1559726753","fastly_info": "MISS", "datacenter": "LCY","client_ip": "88.202.148.160", "req_method": "GET", "req_uri": "/hijkl", "req_h_host": "www.bar.com", "req_h_referer": "", "req_h_user_agent": "curl/7.58.0", "req_h_accept_encoding": "", "req_header_bytes": "111", "req_body_bytes": "0", "resp_status": "404", "resp_bytes": "71071", "resp_header_bytes": "700", "resp_body_bytes": "70371" }
 { "type": "req","service_id": "foo","request_id": "(null)","start_time": "1559726930","fastly_info": "MISS", "datacenter": "LHR","client_ip": "18.130.227.222", "req_method": "GET", "req_uri": "/favicon.ico", "req_h_host": "www.bar.com", "req_h_referer": "", "req_h_user_agent": "Slack-ImgProxy (+https://api.slack.com/robots)", "req_h_accept_encoding": "gzip", "req_header_bytes": "184", "req_body_bytes": "0", "resp_status": "200", "resp_bytes": "2508", "resp_header_bytes": "659", "resp_body_bytes": "1849" }``
+
+
 ``````
+#### sync
+
+Sync local CSV files with an existing edge dictionary.
+
+CSV files are of the format KEY,VALUE (see ./fixtures)
+```
+./fastly-cli sync --dict={{DICTIONARY_NAME}} --path={{PATH TO CSV FILE}} --service={{SERVICE_NAME}}
+```
+Updates are batched as a series of creates, deletes and updates.
+
 #### create
 
 Create a new Fastly service and an optional API key scoped to that service.

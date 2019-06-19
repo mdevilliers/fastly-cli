@@ -17,7 +17,7 @@ const (
 	fastlyServiceURLPattern = "https://manage.fastly.com/configure/services/%s"
 )
 
-func registerLaunchCommand(root *cobra.Command) {
+func registerLaunchCommand(root *cobra.Command) error {
 
 	launchCommand := &cobra.Command{
 		Use:   "launch",
@@ -56,6 +56,7 @@ func registerLaunchCommand(root *cobra.Command) {
 	}
 
 	root.AddCommand(launchCommand)
+	return nil
 }
 
 func getServiceWithPredicate(client *fastly.Client, term string) (*fastly.Service, error) {
