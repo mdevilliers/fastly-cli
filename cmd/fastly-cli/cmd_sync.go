@@ -19,7 +19,7 @@ func registerSyncCommand(root *cobra.Command) error {
 
 	syncCommand := &cobra.Command{
 		Use:   "sync",
-		Short: "Sync local dictionaries with Fastly edge dictionaries.",
+		Short: "Sync local CSV files with Fastly edge dictionaries.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			client, err := fastly.NewClient(globalConfig.FastlyAPIKey)
@@ -75,8 +75,8 @@ func registerSyncCommand(root *cobra.Command) error {
 
 	syncCommand.Flags().StringVar(&localFile, "path", localFile, "path to file")
 	syncCommand.Flags().StringVar(&filetype, "file-type", "CSV", "type of file")
-	syncCommand.Flags().StringVar(&dict, "dict", dict, "dictionary to update")
-	syncCommand.Flags().StringVar(&service, "service", service, "service to update")
+	syncCommand.Flags().StringVar(&dict, "dict", dict, "name of dictionary to update")
+	syncCommand.Flags().StringVar(&service, "service", service, "name of service to update")
 
 	err := markFlagsRequired(syncCommand, "path", "dict", "service")
 

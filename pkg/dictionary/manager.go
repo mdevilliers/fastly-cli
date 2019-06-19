@@ -12,7 +12,7 @@ import (
 
 const (
 	// https://docs.fastly.com/guides/edge-dictionaries/about-edge-dictionaries
-	// Dictionary containers are limited to 1000 items.
+	// Dictionaries are limited to 1000 items.
 	maxItems = 1000
 	// Dictionary item keys are limited to 256 characters and their values are limited to 8000 characters
 	maxKeyLength   = 256
@@ -80,7 +80,7 @@ func (m *manager) Sync() error {
 	// get all or the remote items
 	remoteItems, err := m.remote.ListDictionaryItems(&fastly.ListDictionaryItemsInput{
 		Service:    m.serviceID,
-		Dictionary: m.dictionaryID, // NOTE : this is the ID of the dictionary not the name
+		Dictionary: m.dictionaryID,
 	})
 
 	if err != nil {
