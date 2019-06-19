@@ -3,10 +3,12 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"fmt"
 	"os"
 
 	"github.com/fastly/go-fastly/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/dictionary"
+	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +37,37 @@ func registerSyncCommand(root *cobra.Command) error {
 
 			reader := csv.NewReader(bufio.NewReader(csvFile))
 
-			syncer := dictionary.Manager(client, dictionary.WithLocalReader(reader), dictionary.WithRemoteDictionary(service, dict))
+			services, err := client.ListServices(&fastly.ListServicesInput{})
+
+			if err != nil {
+				return errors.Wrap(err, "error searching fastly for services")
+			}
+
+			version := 0
+			serviceID := ""
+			for _, s := range services {
+				if s.Name == service {
+					version = int(s.ActiveVersion)
+					serviceID = s.ID
+				}
+			}
+
+			if version == 0 {
+				return fmt.Errorf("cannot find service : %s", service)
+			}
+
+			dictInstance, err := client.GetDictionary(&fastly.GetDictionaryInput{
+				Service: serviceID,
+				Version: version,
+				Name:    dict,
+			})
+
+			if err != nil {
+				return errors.Wrap(err, "error getting dictionary ID")
+			}
+
+			extendedClient := fastly_ext.NewExtendedClient(client)
+			syncer := dictionary.Manager(extendedClient, dictionary.WithLocalReader(reader), dictionary.WithRemoteDictionary(serviceID, dictInstance.ID))
 
 			return syncer.Sync()
 		},

@@ -4,28 +4,22 @@ import (
 	"testing"
 
 	"github.com/fastly/go-fastly/fastly"
+	fastlyext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
 type mockRemoteSource struct {
 	itemLister  func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error)
-	itemUpdater func(i *fastly.UpdateDictionaryItemInput) (*fastly.DictionaryItem, error)
-	itemCreator func(*fastly.CreateDictionaryItemInput) (*fastly.DictionaryItem, error)
-	itemDeleter func(i *fastly.DeleteDictionaryItemInput) error
+	itemBatcher func(i *fastlyext.BatchUpdateDictionaryItemsInput) error
 }
 
 func (m *mockRemoteSource) ListDictionaryItems(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
 	return m.itemLister(i)
 }
-func (m *mockRemoteSource) UpdateDictionaryItem(i *fastly.UpdateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-	return m.itemUpdater(i)
-}
-func (m *mockRemoteSource) CreateDictionaryItem(i *fastly.CreateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-	return m.itemCreator(i)
-}
-func (m *mockRemoteSource) DeleteDictionaryItem(i *fastly.DeleteDictionaryItemInput) error {
-	return m.itemDeleter(i)
+
+func (m *mockRemoteSource) BatchUpdateDictionaryItems(i *fastlyext.BatchUpdateDictionaryItemsInput) error {
+	return m.itemBatcher(i)
 }
 
 type mockLocalReader struct {
@@ -143,17 +137,20 @@ func Test_DiffAndMutate(t *testing.T) {
 			updateCount := 0
 
 			client := &mockRemoteSource{
-				itemCreator: func(i *fastly.CreateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-					createCount++
-					return &fastly.DictionaryItem{}, nil
-				},
-				itemDeleter: func(i *fastly.DeleteDictionaryItemInput) error {
-					deleteCount++
+				itemBatcher: func(i *fastlyext.BatchUpdateDictionaryItemsInput) error {
+
+					for _, u := range i.Items {
+
+						switch u.Operation {
+						case fastlyext.CreateBatchOperation:
+							createCount++
+						case fastlyext.DeleteBatchOperation:
+							deleteCount++
+						case fastlyext.UpdateBatchOperation:
+							updateCount++
+						}
+					}
 					return nil
-				},
-				itemUpdater: func(i *fastly.UpdateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-					updateCount++
-					return &fastly.DictionaryItem{}, nil
 				},
 				itemLister: tc.remoteLister,
 			}
@@ -187,25 +184,14 @@ func Test_RemoteDictionaryOption(t *testing.T) {
 	count := 0
 
 	client := &mockRemoteSource{
-		itemCreator: func(i *fastly.CreateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-			count++
-			require.Equal(t, dictionary, i.Dictionary)
-			require.Equal(t, service, i.Service)
-			return &fastly.DictionaryItem{}, nil
-		},
-		itemDeleter: func(i *fastly.DeleteDictionaryItemInput) error {
-			count++
+
+		itemBatcher: func(i *fastlyext.BatchUpdateDictionaryItemsInput) error {
+
 			require.Equal(t, dictionary, i.Dictionary)
 			require.Equal(t, service, i.Service)
 
+			count = count + len(i.Items)
 			return nil
-		},
-		itemUpdater: func(i *fastly.UpdateDictionaryItemInput) (*fastly.DictionaryItem, error) {
-			count++
-			require.Equal(t, dictionary, i.Dictionary)
-			require.Equal(t, service, i.Service)
-
-			return &fastly.DictionaryItem{}, nil
 		},
 		itemLister: func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
 			count++
