@@ -1,16 +1,17 @@
-package eavesdrop
+package builder
 
 import (
 	"github.com/fastly/go-fastly/fastly"
 	"github.com/pkg/errors"
 )
 
-type serviceInfo struct {
+// ServiceInfo contains the current fastly.Service ID and Version
+type ServiceInfo struct {
 	ID      string
 	Version int
 }
 
-type serviceMutator func(current serviceInfo) error
+type serviceMutator func(current ServiceInfo) error
 
 type builder struct {
 	client         clonerActivator
@@ -24,9 +25,9 @@ type clonerActivator interface {
 	ActivateVersion(i *fastly.ActivateVersionInput) (*fastly.Version, error)
 }
 
-// NewBuilder returns a builder instance that will `Clone`` the current version of a service,
+// New returns a builder instance that will `Clone`` the current version of a service,
 // apply a series of changes and then `Activate` if no errors
-func NewBuilder(client clonerActivator, serviceID string, serviceVersion int) *builder {
+func New(client clonerActivator, serviceID string, serviceVersion int) *builder {
 	return &builder{
 		client:         client,
 		serviceID:      serviceID,
@@ -50,15 +51,15 @@ func (b *builder) clone() error {
 	return nil
 }
 
-// Action takes a series of functions that mutate the current instance or return
+// Apply takes a series of functions that mutate the current instance or return
 // the first error
-func (b *builder) Action(fn ...serviceMutator) error {
+func (b *builder) Apply(fn ...serviceMutator) error {
 
 	if err := b.clone(); err != nil {
 		return err
 	}
 
-	info := serviceInfo{ID: b.serviceID, Version: b.latestVersion}
+	info := ServiceInfo{ID: b.serviceID, Version: b.latestVersion}
 
 	for i := range fn {
 		if err := fn[i](info); err != nil {

@@ -1,4 +1,4 @@
-package eavesdrop
+package builder
 
 import (
 	"errors"
@@ -37,8 +37,8 @@ func Test_CloneAndActivateCalled_Success(t *testing.T) {
 		},
 	}
 
-	builder := NewBuilder(client, "foo", 1)
-	err := builder.Action() // doing notthing shouldn't error
+	builder := New(client, "foo", 1)
+	err := builder.Apply() // doing notthing shouldn't error
 
 	require.Nil(t, err)
 	require.True(t, client.cloneVersionCalled)
@@ -54,8 +54,8 @@ func Test_CloneFailsWithError(t *testing.T) {
 		},
 	}
 
-	builder := NewBuilder(client, "foo", 1)
-	err := builder.Action()
+	builder := New(client, "foo", 1)
+	err := builder.Apply()
 
 	require.NotNil(t, err)
 	require.False(t, client.activateVersionCalled)
@@ -72,8 +72,8 @@ func Test_ActivateFailsWithError(t *testing.T) {
 		},
 	}
 
-	builder := NewBuilder(client, "foo", 1)
-	err := builder.Action()
+	builder := New(client, "foo", 1)
+	err := builder.Apply()
 
 	require.NotNil(t, err)
 
@@ -90,14 +90,14 @@ func Test_ActionCalledOnSuccess(t *testing.T) {
 		},
 	}
 
-	fn := func(current serviceInfo) error {
+	fn := func(current ServiceInfo) error {
 		require.Equal(t, 1, current.Version)
 		require.Equal(t, "foo", current.ID)
 		return nil
 	}
 
-	builder := NewBuilder(client, "foo", 1)
-	err := builder.Action(fn)
+	builder := New(client, "foo", 1)
+	err := builder.Apply(fn)
 
 	require.Nil(t, err)
 	require.True(t, client.cloneVersionCalled)
@@ -116,13 +116,13 @@ func Test_ActionErrorPassedOn(t *testing.T) {
 		},
 	}
 
-	originalErr := errors.New("booyah!")
-	fn := func(current serviceInfo) error {
+	originalErr := errors.New("booyah")
+	fn := func(current ServiceInfo) error {
 		return originalErr
 	}
 
-	builder := NewBuilder(client, "foo", 1)
-	err := builder.Action(fn)
+	builder := New(client, "foo", 1)
+	err := builder.Apply(fn)
 
 	require.NotNil(t, err)
 	require.Equal(t, originalErr, err)

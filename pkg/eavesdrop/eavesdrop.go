@@ -9,6 +9,7 @@ import (
 	"os/user"
 
 	"github.com/fastly/go-fastly/fastly"
+	"github.com/mdevilliers/fastly-cli/pkg/builder"
 	"github.com/pkg/errors"
 )
 
@@ -72,15 +73,15 @@ func (s *session) Dispose(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting latest service")
 	}
-	builder := NewBuilder(s.client, latest.ID, latest.ActiveVersion.Number)
-	return builder.Action(s.ensurePreviousSessionDoesNotExist)
+	instance := builder.New(s.client, latest.ID, latest.ActiveVersion.Number)
+	return instance.Apply(s.ensurePreviousSessionDoesNotExist)
 }
 
 func (s *session) StartListening() error {
 
-	builder := NewBuilder(s.client, s.Service.ID, int(s.Service.ActiveVersion))
+	instance := builder.New(s.client, s.Service.ID, int(s.Service.ActiveVersion))
 
-	createSyslog := func(current serviceInfo) error {
+	createSyslog := func(current builder.ServiceInfo) error {
 
 		_, err := s.client.CreateSyslog(&fastly.CreateSyslogInput{
 			Service:     current.ID,
@@ -98,7 +99,7 @@ func (s *session) StartListening() error {
 		return nil
 	}
 
-	err := builder.Action(s.ensurePreviousSessionDoesNotExist, createSyslog)
+	err := instance.Apply(s.ensurePreviousSessionDoesNotExist, createSyslog)
 
 	if err != nil {
 		return err
@@ -151,7 +152,7 @@ func handleConnection(connection net.Conn) {
 	}
 }
 
-func (s *session) ensurePreviousSessionDoesNotExist(current serviceInfo) error {
+func (s *session) ensurePreviousSessionDoesNotExist(current builder.ServiceInfo) error {
 
 	syslogName := uniqueName()
 	l, err := s.client.ListSyslogs(&fastly.ListSyslogsInput{

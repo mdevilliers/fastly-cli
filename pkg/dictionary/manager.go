@@ -13,7 +13,7 @@ import (
 const (
 	// https://docs.fastly.com/guides/edge-dictionaries/about-edge-dictionaries
 	// Dictionaries are limited to 1000 items.
-	maxItems = 1000
+	maxItems = 10000
 	// Dictionary item keys are limited to 256 characters and their values are limited to 8000 characters
 	maxKeyLength   = 256
 	maxValueLength = 8000
