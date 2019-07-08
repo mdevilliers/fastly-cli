@@ -17,7 +17,7 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.0.2 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/r3labs/diff v0.0.0-20190624005013-fbe9de54bde7
+	github.com/r3labs/diff v0.0.0-20190708005213-3658fe4f00f3
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
