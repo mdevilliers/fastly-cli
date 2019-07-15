@@ -22,7 +22,7 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.3.0
-	golang.org/x/sys v0.0.0-20190701013707-04f50cda93cb // indirect
+	golang.org/x/sys v0.0.0-20190715062714-fae7ac547cb7 // indirect
 	golang.org/x/tools v0.0.0-20190715053320-607ca053a137 // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 )
