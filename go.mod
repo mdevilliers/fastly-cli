@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
+	github.com/alecthomas/units v0.0.0-20190722003522-c3de453c63f4 // indirect
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/fastly/go-fastly v1.0.0
 	github.com/google/go-querystring v1.0.0
