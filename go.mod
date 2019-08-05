@@ -14,7 +14,7 @@ require (
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pkg/errors v0.8.1
-	github.com/r3labs/diff v0.0.0-20190708005213-3658fe4f00f3
+	github.com/r3labs/diff v0.0.0-20190805004050-a71de73c46ad
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
