@@ -30,7 +30,7 @@ Use "fastly-cli [command] --help" for more information about a command.
 
 #### Install
 
-fastly-cli requires Golang 1.12.1+
+fastly-cli requires Golang 1.13+
 ```
 go get github.com/mdevilliers/fastly-cli/cmd/fastly-cli
 ```
