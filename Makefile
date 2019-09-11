@@ -9,7 +9,7 @@ GO_BIN    := $(BINDIR)
 PATH     := $(GOBIN):$(PATH)
 
 OS := $(shell uname)
-GOLANGCI_LINT_VERSION=1.16.0
+GOLANGCI_LINT_VERSION=1.18.0
 ifeq ($(OS),Darwin)
 	GOLANGCI_LINT_ARCHIVE=golangci-lint-$(GOLANGCI_LINT_VERSION)-darwin-amd64.tar.gz
 else

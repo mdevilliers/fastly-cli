@@ -60,6 +60,9 @@ func (c *Client) GetTokens(i *GetTokensInput) ([]*Token, error) {
 		return nil, err
 	}
 
+	// nolint : errcheck
+	defer resp.Body.Close()
+
 	var s []*Token
 	if err := decodeJSON(&s, resp.Body); err != nil {
 		return nil, err
@@ -100,6 +103,9 @@ func (c *Client) CreateToken(i *CreateTokenInput) (*Token, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// nolint : errcheck
+	defer resp.Body.Close()
 
 	var s *Token
 	if err := decodeJSON(&s, resp.Body); err != nil {
