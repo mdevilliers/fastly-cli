@@ -1,10 +1,11 @@
 module github.com/mdevilliers/fastly-cli
 
-go 1.12
+go 1.13
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/alecthomas/units v0.0.0-20190722003522-c3de453c63f4 // indirect
+	github.com/alecthomas/units v0.0.0-20190717042225-c3de453c63f4 // indirect
+	github.com/axw/gocov v1.0.0 // indirect
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/fastly/go-fastly v1.2.1
 	github.com/google/jsonapi v0.0.0-20181016150055-d0428f63eb51 // indirect
@@ -13,13 +14,14 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/manifoldco/promptui v0.3.2
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/nicksnyder/go-i18n v1.10.1 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/r3labs/diff v0.0.0-20190805004050-a71de73c46ad
+	github.com/r3labs/diff v0.0.0-20190801153147-a71de73c46ad
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/sys v0.0.0-20190904005037-43c01164e931 // indirect
-	golang.org/x/tools v0.0.0-20190903163617-be0da057c5e3 // indirect
+	golang.org/x/tools v0.0.0-20190909030654-5b82db07426d // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 )
