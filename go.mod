@@ -22,6 +22,6 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/sys v0.0.0-20190904005037-43c01164e931 // indirect
-	golang.org/x/tools v0.0.0-20190909030654-5b82db07426d // indirect
+	golang.org/x/tools v0.0.0-20190911022129-16c5e0f7d110 // indirect
 	gopkg.in/alecthomas/kingpin.v3-unstable v3.0.0-20180810215634-df19058c872c // indirect
 )
