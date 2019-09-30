@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/alecthomas/units v0.0.0-20190910110746-680d30ca3117 // indirect
+	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
 	github.com/axw/gocov v1.0.0 // indirect
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/fastly/go-fastly v1.2.1
