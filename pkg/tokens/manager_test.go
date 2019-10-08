@@ -3,17 +3,17 @@ package tokens
 import (
 	"testing"
 
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/stretchr/testify/require"
 )
 
 type mockTokenCreator struct {
-	token *fastly_ext.Token
+	token *fastly.Token
 	err   error
 	count int
 }
 
-func (m *mockTokenCreator) CreateToken(i *fastly_ext.CreateTokenInput) (*fastly_ext.Token, error) {
+func (m *mockTokenCreator) CreateToken(i *fastly.CreateTokenInput) (*fastly.Token, error) {
 	m.count++
 	return m.token, m.err
 }
@@ -21,7 +21,7 @@ func (m *mockTokenCreator) CreateToken(i *fastly_ext.CreateTokenInput) (*fastly_
 func Test_MissingInputsGathered(t *testing.T) {
 
 	client := &mockTokenCreator{
-		token: &fastly_ext.Token{},
+		token: &fastly.Token{},
 	}
 
 	count := 0
@@ -33,18 +33,14 @@ func Test_MissingInputsGathered(t *testing.T) {
 	m := Manager(client, WithInput(tg), WithSecretInput(tg))
 
 	// no username, password, twoFA
-	_, err := m.AddToken(TokenRequest{
-		RequireTwoFAToken: true,
-	})
+	_, err := m.AddToken(TokenRequest{})
 
 	require.Nil(t, err)
-	require.Equal(t, 3, count)
+	require.Equal(t, 2, count)
 
 	// no username, password
 	count = 0
-	_, err = m.AddToken(TokenRequest{
-		RequireTwoFAToken: false,
-	})
+	_, err = m.AddToken(TokenRequest{})
 
 	require.Nil(t, err)
 	require.Equal(t, 2, count)
@@ -52,8 +48,7 @@ func Test_MissingInputsGathered(t *testing.T) {
 	// no username
 	count = 0
 	_, err = m.AddToken(TokenRequest{
-		RequireTwoFAToken: false,
-		Username:          "John Smith",
+		Username: "John Smith",
 	})
 
 	require.Nil(t, err)
@@ -62,9 +57,8 @@ func Test_MissingInputsGathered(t *testing.T) {
 	// all supplied
 	count = 0
 	_, err = m.AddToken(TokenRequest{
-		RequireTwoFAToken: false,
-		Username:          "John Smith",
-		Password:          "secret",
+		Username: "John Smith",
+		Password: "secret",
 	})
 
 	require.Nil(t, err)

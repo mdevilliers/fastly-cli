@@ -8,7 +8,6 @@ import (
 
 	"github.com/fastly/go-fastly/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/dictionary"
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -66,8 +65,7 @@ func registerSyncCommand(root *cobra.Command) error {
 				return errors.Wrap(err, "error getting dictionary ID")
 			}
 
-			extendedClient := fastly_ext.NewExtendedClient(client)
-			syncer := dictionary.Manager(extendedClient, dictionary.WithLocalReader(reader), dictionary.WithRemoteDictionary(serviceID, dictInstance.ID))
+			syncer := dictionary.Manager(client, dictionary.WithLocalReader(reader), dictionary.WithRemoteDictionary(serviceID, dictInstance.ID))
 
 			return syncer.Sync()
 		},
