@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/fastly/go-fastly/fastly"
-	fastlyext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/pkg/errors"
 	"github.com/r3labs/diff"
 )
@@ -28,13 +27,13 @@ type manager struct {
 	serviceID    string
 	dictionaryID string
 	local        localReader
-	remote       remoteDictionaryMutator
+	client       remoteDictionaryMutator
 }
 
 type option func(*manager)
 
 // WithRemoteDictionary allows specifying the Fastly service and dictionary to use
-// NOTE : this that function requires ID's and NOT the name's of the entities
+// NOTE : this that function requires IDs and NOT the name's of the entities
 func WithRemoteDictionary(serviceID, dictionaryID string) option {
 	return func(m *manager) {
 		m.serviceID = serviceID
@@ -54,14 +53,14 @@ func WithLocalReader(reader localReader) option {
 }
 
 type remoteDictionaryMutator interface {
-	ListDictionaryItems(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error)
-	BatchUpdateDictionaryItems(i *fastlyext.BatchUpdateDictionaryItemsInput) error
+	ListDictionaryItems(*fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error)
+	BatchModifyDictionaryItems(*fastly.BatchModifyDictionaryItemsInput) error
 }
 
 // Manager returns a way of syncing a local dictionary with a remote one
 func Manager(client remoteDictionaryMutator, options ...option) *manager { // nolint
 	m := &manager{
-		remote: client,
+		client: client,
 	}
 
 	for _, o := range options {
@@ -78,9 +77,8 @@ func Manager(client remoteDictionaryMutator, options ...option) *manager { // no
 func (m *manager) Sync() error {
 
 	// get all or the remote items
-	remoteItems, err := m.remote.ListDictionaryItems(&fastly.ListDictionaryItemsInput{
-		Service:    m.serviceID,
-		Dictionary: m.dictionaryID,
+	remoteItems, err := m.client.ListDictionaryItems(&fastly.ListDictionaryItemsInput{
+		Service: m.serviceID, Dictionary: m.dictionaryID,
 	})
 
 	if err != nil {
@@ -108,7 +106,7 @@ func (m *manager) Sync() error {
 		return errors.Wrap(err, "error diffing remote and local dictionary items")
 	}
 
-	batchUpdates := []fastlyext.BatchUpdateDictionaryItem{}
+	batchUpdates := []*fastly.BatchDictionaryItem{}
 
 	for change := range changelog {
 
@@ -118,19 +116,19 @@ func (m *manager) Sync() error {
 
 			value := changelog[change].To.(string)
 
-			batchUpdates = append(batchUpdates, fastlyext.BatchUpdateDictionaryItem{
-				Operation: fastlyext.CreateBatchOperation,
-				Key:       key,
-				Value:     value,
+			batchUpdates = append(batchUpdates, &fastly.BatchDictionaryItem{
+				Operation: fastly.CreateBatchOperation,
+				ItemKey:   key,
+				ItemValue: value,
 			})
 
 		}
 
 		if changelog[change].Type == diff.DELETE {
 
-			batchUpdates = append(batchUpdates, fastlyext.BatchUpdateDictionaryItem{
-				Operation: fastlyext.DeleteBatchOperation,
-				Key:       key,
+			batchUpdates = append(batchUpdates, &fastly.BatchDictionaryItem{
+				Operation: fastly.DeleteBatchOperation,
+				ItemKey:   key,
 			})
 
 		}
@@ -139,19 +137,19 @@ func (m *manager) Sync() error {
 
 			value := changelog[change].To.(string)
 
-			batchUpdates = append(batchUpdates, fastlyext.BatchUpdateDictionaryItem{
-				Operation: fastlyext.UpdateBatchOperation,
-				Key:       key,
-				Value:     value,
+			batchUpdates = append(batchUpdates, &fastly.BatchDictionaryItem{
+				Operation: fastly.UpdateBatchOperation,
+				ItemKey:   key,
+				ItemValue: value,
 			})
 
 		}
 
 		// 1000 is the maximum batch size
 		// If we have reached this amount flush the batch now
-		if len(batchUpdates) == fastlyext.BatchUpdateMaximumItems {
+		if len(batchUpdates) == fastly.BatchModifyMaximumOperations {
 
-			err := m.remote.BatchUpdateDictionaryItems(&fastlyext.BatchUpdateDictionaryItemsInput{
+			err := m.client.BatchModifyDictionaryItems(&fastly.BatchModifyDictionaryItemsInput{
 				Service:    m.serviceID,
 				Dictionary: m.dictionaryID,
 				Items:      batchUpdates,
@@ -160,7 +158,7 @@ func (m *manager) Sync() error {
 			if err != nil {
 				return errors.Wrap(err, "error updating batch")
 			}
-			batchUpdates = []fastlyext.BatchUpdateDictionaryItem{}
+			batchUpdates = []*fastly.BatchDictionaryItem{}
 		}
 	}
 
@@ -169,7 +167,7 @@ func (m *manager) Sync() error {
 	}
 
 	// flush the last batch if any
-	return m.remote.BatchUpdateDictionaryItems(&fastlyext.BatchUpdateDictionaryItemsInput{
+	return m.client.BatchModifyDictionaryItems(&fastly.BatchModifyDictionaryItemsInput{
 		Service:    m.serviceID,
 		Dictionary: m.dictionaryID,
 		Items:      batchUpdates,

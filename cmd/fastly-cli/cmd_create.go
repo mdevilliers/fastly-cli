@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/fastly/go-fastly/fastly"
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -16,7 +15,6 @@ func registerCreateCommand(root *cobra.Command) error {
 	var tokenName string
 	var tokenScope string
 	var createAPIKey bool
-	var enable2FA bool
 
 	createCommand := &cobra.Command{
 		Use:   "create",
@@ -49,18 +47,21 @@ func registerCreateCommand(root *cobra.Command) error {
 				tokenName = serviceName
 			}
 
-			tokenInput := tokens.TokenRequest{
-				Name:              tokenName,
-				Services:          []string{service.ID},
-				Scope:             tokenScope,
-				RequireTwoFAToken: enable2FA,
-				Username:          globalConfig.FastlyUserName,
-				Password:          globalConfig.FastlyUserPassword,
+			scope, err := stringToTokenScope(tokenScope)
+
+			if err != nil {
+				return err
 			}
 
-			extendedClient := fastly_ext.NewExtendedClient(client)
+			tokenInput := tokens.TokenRequest{
+				Name:     tokenName,
+				Services: []string{service.ID},
+				Scope:    scope,
+				Username: globalConfig.FastlyUserName,
+				Password: globalConfig.FastlyUserPassword,
+			}
 
-			tokenManager := tokens.Manager(extendedClient)
+			tokenManager := tokens.Manager(client)
 			token, err := tokenManager.AddToken(tokenInput)
 
 			if err != nil {
@@ -78,7 +79,6 @@ func registerCreateCommand(root *cobra.Command) error {
 	createCommand.Flags().StringVar(&tokenScope, "token-scope", "global", "scope of the API token to create")
 
 	createCommand.Flags().BoolVar(&createAPIKey, "create-api-token", false, "create an API token")
-	createCommand.Flags().BoolVar(&enable2FA, "enable-2FA", true, "use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
 	err := createCommand.MarkFlagRequired("service-name")
 

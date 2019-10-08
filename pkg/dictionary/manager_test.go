@@ -4,21 +4,20 @@ import (
 	"testing"
 
 	"github.com/fastly/go-fastly/fastly"
-	fastlyext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
 type mockRemoteSource struct {
 	itemLister  func(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error)
-	itemBatcher func(i *fastlyext.BatchUpdateDictionaryItemsInput) error
+	itemBatcher func(i *fastly.BatchModifyDictionaryItemsInput) error
 }
 
 func (m *mockRemoteSource) ListDictionaryItems(i *fastly.ListDictionaryItemsInput) ([]*fastly.DictionaryItem, error) {
 	return m.itemLister(i)
 }
 
-func (m *mockRemoteSource) BatchUpdateDictionaryItems(i *fastlyext.BatchUpdateDictionaryItemsInput) error {
+func (m *mockRemoteSource) BatchModifyDictionaryItems(i *fastly.BatchModifyDictionaryItemsInput) error {
 	return m.itemBatcher(i)
 }
 
@@ -137,16 +136,16 @@ func Test_DiffAndMutate(t *testing.T) {
 			updateCount := 0
 
 			client := &mockRemoteSource{
-				itemBatcher: func(i *fastlyext.BatchUpdateDictionaryItemsInput) error {
+				itemBatcher: func(i *fastly.BatchModifyDictionaryItemsInput) error {
 
 					for _, u := range i.Items {
 
 						switch u.Operation {
-						case fastlyext.CreateBatchOperation:
+						case fastly.CreateBatchOperation:
 							createCount++
-						case fastlyext.DeleteBatchOperation:
+						case fastly.DeleteBatchOperation:
 							deleteCount++
-						case fastlyext.UpdateBatchOperation:
+						case fastly.UpdateBatchOperation:
 							updateCount++
 						}
 					}
@@ -185,7 +184,7 @@ func Test_RemoteDictionaryOption(t *testing.T) {
 
 	client := &mockRemoteSource{
 
-		itemBatcher: func(i *fastlyext.BatchUpdateDictionaryItemsInput) error {
+		itemBatcher: func(i *fastly.BatchModifyDictionaryItemsInput) error {
 
 			require.Equal(t, dictionary, i.Dictionary)
 			require.Equal(t, service, i.Service)

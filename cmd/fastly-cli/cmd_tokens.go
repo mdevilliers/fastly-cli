@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/fastly/go-fastly/fastly"
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
 	"github.com/mdevilliers/fastly-cli/pkg/tokens"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -21,7 +20,6 @@ func registerTokenCommands(root *cobra.Command) error {
 	}
 
 	var tokenName, service, tokenScope string
-	var enable2FA bool
 
 	addToken := &cobra.Command{
 		Use:   "add",
@@ -38,18 +36,21 @@ func registerTokenCommands(root *cobra.Command) error {
 				return errors.New("supply a service name")
 			}
 
-			tokenInput := tokens.TokenRequest{
-				Name:              tokenName,
-				Services:          []string{service},
-				Scope:             tokenScope,
-				RequireTwoFAToken: enable2FA,
-				Username:          globalConfig.FastlyUserName,
-				Password:          globalConfig.FastlyUserPassword,
+			scope, err := stringToTokenScope(tokenScope)
+
+			if err != nil {
+				return err
 			}
 
-			extendedClient := fastly_ext.NewExtendedClient(client)
+			tokenInput := tokens.TokenRequest{
+				Name:     tokenName,
+				Services: []string{service},
+				Scope:    scope,
+				Username: globalConfig.FastlyUserName,
+				Password: globalConfig.FastlyUserPassword,
+			}
 
-			tokenManager := tokens.Manager(extendedClient)
+			tokenManager := tokens.Manager(client)
 			token, err := tokenManager.AddToken(tokenInput)
 
 			if err != nil {
@@ -66,7 +67,6 @@ func registerTokenCommands(root *cobra.Command) error {
 	addToken.Flags().StringVar(&service, "service-name", service, "name of service to create the API token for")
 	addToken.Flags().StringVar(&tokenName, "token-name", tokenName, "name of the API token to create.")
 	addToken.Flags().StringVar(&tokenScope, "token-scope", "global", "scope of the API token to create")
-	addToken.Flags().BoolVar(&enable2FA, "enable-2FA", true, "use 2FA. If enabled you will be asked to provide a token when creating an API user")
 
 	err := markFlagsRequired(addToken, "service-name", "token-name")
 
@@ -85,9 +85,7 @@ func registerTokenCommands(root *cobra.Command) error {
 				return errors.Wrap(err, "cannot create fastly client")
 			}
 
-			extendedClient := fastly_ext.NewExtendedClient(client)
-
-			all, err := extendedClient.GetTokens(&fastly_ext.GetTokensInput{})
+			all, err := client.ListTokens()
 
 			if err != nil {
 				return errors.Wrap(err, "error listing tokens")
@@ -107,4 +105,19 @@ func registerTokenCommands(root *cobra.Command) error {
 
 	root.AddCommand(tokenRoot)
 	return nil
+}
+
+func stringToTokenScope(str string) (fastly.TokenScope, error) {
+
+	potential := fastly.TokenScope(str)
+
+	switch potential {
+	case fastly.GlobalScope:
+	case fastly.PurgeSelectScope:
+	case fastly.PurgeAllScope:
+	case fastly.GlobalReadScope:
+		return potential, nil
+
+	}
+	return potential, fmt.Errorf("invalid TokenScope : %s", str)
 }

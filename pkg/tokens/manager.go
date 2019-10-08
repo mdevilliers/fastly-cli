@@ -1,19 +1,18 @@
 package tokens
 
 import (
-	fastly_ext "github.com/mdevilliers/fastly-cli/pkg/fastly-ext"
+	"github.com/fastly/go-fastly/fastly"
 	"github.com/mdevilliers/fastly-cli/pkg/terminal"
 )
 
 // TokenRequest contains data required to create a Fastly API token
 type TokenRequest struct {
-	Name              string
-	Username          string
-	Password          string
-	Scope             string
-	TwoFAToken        string
-	RequireTwoFAToken bool
-	Services          []string
+	Name       string
+	Username   string
+	Password   string
+	Scope      fastly.TokenScope
+	TwoFAToken string
+	Services   []string
 }
 
 // Token is a created Fastly API token
@@ -25,7 +24,7 @@ type Token struct {
 }
 
 type tokenCreator interface {
-	CreateToken(i *fastly_ext.CreateTokenInput) (*fastly_ext.Token, error)
+	CreateToken(i *fastly.CreateTokenInput) (*fastly.Token, error)
 }
 
 type tokenManager struct {
@@ -69,13 +68,12 @@ func Manager(client tokenCreator, options ...option) *tokenManager { // nolint
 // AddToken creates an API Token for a service(s) or an error
 func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 
-	tokenInput := &fastly_ext.CreateTokenInput{
-		Username:   req.Username,
-		Name:       req.Name,
-		Password:   req.Password,
-		TwoFAToken: req.TwoFAToken,
-		Services:   req.Services,
-		Scope:      req.Scope,
+	tokenInput := &fastly.CreateTokenInput{
+		Name:     req.Name,
+		Scope:    req.Scope,
+		Username: req.Username,
+		Password: req.Password,
+		Services: req.Services,
 	}
 
 	username, err := suppliedOrInteractive(req.Username, "Enter your Fastly username", t.in)
@@ -93,17 +91,6 @@ func (t *tokenManager) AddToken(req TokenRequest) (Token, error) {
 	}
 
 	tokenInput.Password = password
-
-	if req.RequireTwoFAToken {
-
-		token, err := suppliedOrInteractive(req.TwoFAToken, "Enter your Fastly 2FA", t.inSecret) // nolint: govet
-
-		if err != nil {
-			return Token{}, err
-		}
-
-		tokenInput.TwoFAToken = token
-	}
 
 	resp, err := t.client.CreateToken(tokenInput)
 
