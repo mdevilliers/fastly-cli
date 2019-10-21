@@ -85,6 +85,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/r3labs/diff v0.0.0-20190801153147-a71de73c46ad h1:j5pg/OewZJyE6i3hIG4v3eQUvUyFdQkC8Nd/mjaEkxE=
 github.com/r3labs/diff v0.0.0-20190801153147-a71de73c46ad/go.mod h1:ozniNEFS3j1qCwHKdvraMn1WJOsUxHd7lYfukEIS4cs=
+github.com/r3labs/diff v0.0.0-20191018104334-e3ae93f4edbb h1:kaV32NbiIn7ESdHB4PEW2VTKhB0odk9wo4/yW2acmoo=
+github.com/r3labs/diff v0.0.0-20191018104334-e3ae93f4edbb/go.mod h1:ozniNEFS3j1qCwHKdvraMn1WJOsUxHd7lYfukEIS4cs=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/sahilm/fuzzy v0.1.0 h1:FzWGaw2Opqyu+794ZQ9SYifWv2EIXpwP4q8dY1kDAwI=
 github.com/sahilm/fuzzy v0.1.0/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
