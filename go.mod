@@ -15,7 +15,7 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/nicksnyder/go-i18n v1.10.1 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/r3labs/diff v0.0.0-20191018104334-e3ae93f4edbb
+	github.com/r3labs/diff v0.0.0-20191120142937-b4ed99a31f5a
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
 	github.com/spf13/cobra v0.0.5
