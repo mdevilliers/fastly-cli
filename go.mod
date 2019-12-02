@@ -4,16 +4,14 @@ go 1.13
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
 	github.com/axw/gocov v1.0.0 // indirect
 	github.com/fastly/go-fastly v1.3.0
 	github.com/google/jsonapi v0.0.0-20181016150055-d0428f63eb51 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kylelemons/godebug v1.1.0 // indirect
-	github.com/manifoldco/promptui v0.3.2
+	github.com/manifoldco/promptui v0.6.0
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/nicksnyder/go-i18n v1.10.1 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/r3labs/diff v0.0.0-20191018104334-e3ae93f4edbb
 	github.com/sahilm/fuzzy v0.1.0
