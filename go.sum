@@ -37,6 +37,8 @@ github.com/fastly/go-fastly v1.2.1 h1:7aZI3PL9vHDuHcBgLwj3uv+yCd80tpKTr10B3Q3A1V
 github.com/fastly/go-fastly v1.2.1/go.mod h1:ACxsUdqChasXcraa3/IigjE01rVn3A1F4vaI18Gmm0g=
 github.com/fastly/go-fastly v1.3.0 h1:halI6tkEmn5JIeW888P2bNGprGP7OYot+o1akPXvPyY=
 github.com/fastly/go-fastly v1.3.0/go.mod h1:cBtWXhszIFx9xpzgm9L/3PW3Ixszo153xJBEHJghGUk=
+github.com/fastly/go-fastly v1.4.0 h1:HAEsfIT97X6Tv5QXBxW4BfDoeecBe+F3yJdRvaQRVhs=
+github.com/fastly/go-fastly v1.4.0/go.mod h1:cBtWXhszIFx9xpzgm9L/3PW3Ixszo153xJBEHJghGUk=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/golang/lint v0.0.0-20181026193005-c67002cb31c3 h1:I4BOK3PBMjhWfQM2zPJKK7lOBGsrsvOB7kBELP33hiE=
 github.com/golang/lint v0.0.0-20181026193005-c67002cb31c3/go.mod h1:tluoj9z5200jBnyusfRPU2LqT6J+DAorxEvtC7LHB+E=
@@ -71,6 +73,8 @@ github.com/manifoldco/promptui v0.3.2 h1:rir7oByTERac6jhpHUPErHuopoRDvO3jxS+Fdad
 github.com/manifoldco/promptui v0.3.2/go.mod h1:8JU+igZ+eeiiRku4T5BjtKh2ms8sziGpSYl1gN8Bazw=
 github.com/manifoldco/promptui v0.6.0 h1:GuXmIdl5lhlamnWf3NbsKWYlaWyHABeStbD1LLsQMuA=
 github.com/manifoldco/promptui v0.6.0/go.mod h1:o9/C5VV8IPXxjxpl9au84MtQGIi5dwn7eldAgEdePPs=
+github.com/manifoldco/promptui v0.7.0 h1:3l11YT8tm9MnwGFQ4kETwkzpAwY2Jt9lCrumCUW4+z4=
+github.com/manifoldco/promptui v0.7.0/go.mod h1:n4zTdgP0vr0S3w7/O/g98U+e0gwLScEXGwov2nIKuGQ=
 github.com/mattn/go-colorable v0.0.9 h1:UVL0vNpWh04HeJXV0KLcaT7r06gOH2l4OW6ddYRUIY4=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.4 h1:bnP0vzxcAdeI1zdubAl5PjU6zsERjGZb7raWodagDYs=
@@ -85,6 +89,7 @@ github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/r3labs/diff v0.0.0-20190801153147-a71de73c46ad h1:j5pg/OewZJyE6i3hIG4v3eQUvUyFdQkC8Nd/mjaEkxE=
