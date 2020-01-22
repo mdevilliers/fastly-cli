@@ -15,7 +15,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/r3labs/diff v0.0.0-20191120142937-b4ed99a31f5a
 	github.com/sahilm/fuzzy v0.1.0
-	github.com/skratchdot/open-golang v0.0.0-20190402232053-79abb63cd66e
+	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/sys v0.0.0-20190913121621-c3b328c6e5a7 // indirect
