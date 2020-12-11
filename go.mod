@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/axw/gocov v1.0.0 // indirect
-	github.com/fastly/go-fastly v1.18.0
+	github.com/fastly/go-fastly/v2/v2 v2.1.0
 	github.com/google/jsonapi v0.0.0-20181016150055-d0428f63eb51 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kylelemons/godebug v1.1.0 // indirect
