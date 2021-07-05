@@ -143,7 +143,7 @@ func handleConnection(connection net.Conn) {
 
 		if err != nil {
 			fmt.Println(err.Error())
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 		}

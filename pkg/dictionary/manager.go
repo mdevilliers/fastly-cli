@@ -83,8 +83,7 @@ func (m *manager) Sync() error {
 
 	if err != nil {
 
-		httpError, ok := err.(*fastly.HTTPError)
-
+		httpError, ok := err.(*fastly.HTTPError) // nolint: errorlint
 		if ok {
 			if httpError.StatusCode == http.StatusNotFound {
 				return errors.New("dictionary not found")
