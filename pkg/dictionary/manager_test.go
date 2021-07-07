@@ -147,6 +147,8 @@ func Test_DiffAndMutate(t *testing.T) {
 							deleteCount++
 						case fastly.UpdateBatchOperation:
 							updateCount++
+						case fastly.UpsertBatchOperation:
+							// TODO : work out what to do
 						}
 					}
 					return nil
