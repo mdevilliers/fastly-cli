@@ -1,4 +1,3 @@
-PACKAGES := $(shell go list ./... | grep -v /vendor/ )
 BINDIR   := $(CURDIR)/bin
 
 GO_TEST = go test -covermode=atomic
@@ -23,10 +22,7 @@ all: test
 
 .PHONY: test
 test:
-ifeq ("$(wildcard $(shell which gocov))","")
-	go get github.com/axw/gocov/gocov
-endif
-	gocov test ${PACKAGES} | gocov report
+	$(GO_TEST) ./...
 
 clean: ## clean up
 	rm -rf tmp/
