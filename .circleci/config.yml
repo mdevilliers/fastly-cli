@@ -3,9 +3,6 @@ jobs:
   build:
     docker:
       - image: cimg/go:1.19
-        environment:
-          GO111MODULE: "on"
-    working_directory: /go/src/github.com/mdevilliers/fastly-cli
     steps:
       - checkout
       - run: make lint
