@@ -1,6 +1,6 @@
 module github.com/mdevilliers/fastly-cli
 
-go 1.17
+go 1.19
 
 require (
 	github.com/fastly/go-fastly v1.18.0
