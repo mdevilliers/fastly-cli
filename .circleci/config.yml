@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.17
+      - image: circleci/golang:1.19
         environment:
           GO111MODULE: "on"
     working_directory: /go/src/github.com/mdevilliers/fastly-cli
