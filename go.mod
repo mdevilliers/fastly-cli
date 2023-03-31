@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/fastly/go-fastly v1.18.0
+	github.com/fastly/go-fastly/v7 v7.5.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/pkg/errors v0.9.1
@@ -18,7 +19,7 @@ require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/google/jsonapi v0.0.0-20201022225600-f822737867f6 // indirect
+	github.com/google/jsonapi v1.0.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
