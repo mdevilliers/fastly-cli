@@ -7,7 +7,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/pkg/errors v0.9.1
-	github.com/r3labs/diff v1.1.0
+	github.com/r3labs/diff/v3 v3.0.1
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.7.0
